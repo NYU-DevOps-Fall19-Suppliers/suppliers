@@ -4,3 +4,6 @@ Thumbs.db
 
 # Hidden Vagrant folder
 .vagrant/
+
+# Log files
+*.log

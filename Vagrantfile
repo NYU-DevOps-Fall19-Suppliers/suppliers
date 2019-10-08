@@ -88,6 +88,16 @@ Vagrant.configure("2") do |config|
     sudo pip install -r requirements.txt
   SHELL
 
+  # Add MongoDB docker container
+  # docker run --name some-mongo -v /my/own/datadir:/data/db -d mongo
+  # To use interactive bash: docker exec -it mongodb bash
+  # The MongoDB Server log is available: docker logs mongodb
+  config.vm.provision "docker" do |d|
+    d.pull_images "mongo"
+    d.run "mongo",
+      args: "--name mongodb -d -p 27017:27017 -v mongo_data:/data/db "
+  end
+
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
