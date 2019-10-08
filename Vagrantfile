@@ -78,14 +78,13 @@ Vagrant.configure("2") do |config|
   # Setup a Python development environment
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y git python-pip python-dev build-essential
-    pip install --upgrade pip
+    apt-get install -y git python3 python3-pip python3-venv
     apt-get -y autoremove
     # Make vi look nice ;-)
     sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
     # Install app dependencies
     cd /vagrant
-    sudo pip install -r requirements.txt
+    pip3 install -r requirements.txt
   SHELL
 
   # Add MongoDB docker container

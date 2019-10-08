@@ -11,7 +11,7 @@ import unittest
 import os
 import logging
 from flask_api import status    # HTTP Status Codes
-from mock import MagicMock, patch
+from unittest.mock import MagicMock, patch
 from .suppliers_factory import SupplierFactory
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
