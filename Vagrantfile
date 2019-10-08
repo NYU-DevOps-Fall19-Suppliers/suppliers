@@ -80,8 +80,6 @@ Vagrant.configure("2") do |config|
     apt-get update
     apt-get install -y git python3 python3-pip python3-venv
     apt-get -y autoremove
-    # Make vi look nice ;-)
-    sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
     # Install app dependencies
     cd /vagrant
     pip3 install -r requirements.txt
