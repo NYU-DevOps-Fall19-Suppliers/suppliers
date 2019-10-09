@@ -16,10 +16,5 @@ mongo = PyMongo(server)
 def index():
     return "Welcome to supplier team!"
 
-@server.route('/suppliers/<supplierID>', methods=['GET']))
-def supplier(supplierID):
-    # Got to connect to the MongoDB server
-    return supllierID
-
 if __name__ == '__main__':
     server.run()
