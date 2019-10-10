@@ -16,6 +16,10 @@ mongo = PyMongo(server)
 def read(supplierID):
 	return str(supplierID)
 
+@server.route('/suppliers/<int:supplierID>', methods = ['POST'])
+def create(supplierID):
+	return str(supplierID)
+
 @server.route('/')
 def index():
     return "Welcome to supplier team!"
