@@ -12,6 +12,10 @@ mongo = PyMongo(server)
 # to the database named myDatabase.
 # This database is exposed as the db attribute. (mongo.db)
 
+@server.route('/suppliers/<int:supplierID>', methods = ['GET'])
+def read(supplierID):
+	return str(supplierID)
+
 @server.route('/')
 def index():
     return "Welcome to supplier team!"
