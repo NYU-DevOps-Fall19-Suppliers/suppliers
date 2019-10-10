@@ -24,5 +24,9 @@ def create(supplierID):
 def index():
     return "Welcome to supplier team!"
 
+@server.route('/suppliers', methods = ['GET'])
+def list_suppliers():
+    return "list of suppliers"
+
 if __name__ == '__main__':
     server.run()
