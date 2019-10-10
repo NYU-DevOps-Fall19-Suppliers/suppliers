@@ -1,7 +1,7 @@
 # Runtime dependencies
 Flask==1.1.1
 Flask-API==1.1
-Flask-PyMongo>=2.3.0
+flask-mongoengine==0.9.5
 
 
 # Testing
