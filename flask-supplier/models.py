@@ -1,29 +1,79 @@
+import logging
 from flask import Flask
 from flask_mongoengine import MongoEngine
 from flask_mongoengine.wtf import model_form
 
-app = Flask(__name__)
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'myDatabase',
-    'host': '127.0.0.1',
-    'port': 27017
-}
-db = MongoEngine(app)
+db = MongoEngine()
 
-class Product(db.Document):
-    """
-    Class that represents a product id
-    """
-    product_id = db.StringField(required=True)
+# class Product(db.Document):
+#     """
+#     Class that represents a product id
+#     """
+#     product_id = db.IntField(required=True)
 
 class Supplier(db.Document):
     """
     Suppliers data schema: https://github.com/nyu-devops-fall19-suppliers/suppliers/issues/21
     """
+    logger = logging.getLogger('flask.app')
+    app = None
+
+    # Table Schema
+    supplierID = db.IntField(required=True)
     supplierName = db.StringField(required=True)
     address = db.StringField(required=True)
-    productIdList = db.ListField(db.ReferenceField(Product))
+    productIdList = db.ListField(db.IntField(), required=True)
     averageRating = db.IntField(required=True)
+
+    def __repr__(self):
+        return '<Supplier %r>' % (self.supplierName)
+
+    def save(self):
+        """
+        Saves a Supplier to the data store
+        """
+        supplier.logger.info('Saving %s', self.supplierName)
+        if not self.supplierID:
+            self.save()
+
+    def serialize(self):
+        """ Serializes a Supplier into a dictionary """
+        return {"supplierID": self.supplierID,
+                "supplierNamee": self.supplierNamee,
+                "address": self.address,
+                "productIDList": self.productIDList}
+
+    def deserialize(self, data):
+        """
+        Deserializes a Supplier from a dictionary
+
+        Args:
+            data (dict): A dictionary containing the Supplier data
+        """
+        try:
+            self.supplierName = data['supplierNamee']
+            self.address = data['address']
+            self.averageRatingy = data['averageRating']
+            product = Product()
+            self.productIDList = data['productIDList']
+        except KeyError as error:
+            raise DataValidationError('Invalid supplier: missing ' + error.args[0])
+        except TypeError as error:
+            raise DataValidationError('Invalid supplier: body of request contained' \
+                                      'bad or no data')
+        return self
+
+    @classmethod
+    def init_db(cls, app):
+        """ Initializes the database session """       
+        cls.logger.info('Initializing database')
+        cls.app = app
+        # This is where we initialize mongoDB from the Flask app
+        db.init_app(app)
+        app.app_context().push()
+        db.create_all()
+
+
 
 """
 Test case for evaluating if the database is properly connected
