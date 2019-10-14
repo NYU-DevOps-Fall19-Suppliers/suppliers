@@ -128,6 +128,14 @@ def list_suppliers():
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
+# UPDATE AN EXISTING SUPPLIER
+######################################################################
+@app.route('/suppliers/<int:supplier_id>', methods=['PUT'])
+def update_suppliers(supplier_id):
+    return str(supplier_id)
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
