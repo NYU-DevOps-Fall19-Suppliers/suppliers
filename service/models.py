@@ -87,6 +87,15 @@ class Supplier(Document):
         except DoesNotExist:
             return None
 
+    @classmethod
+    def find_by_name(cla, supplier_name)
+        """ Find a supplier by it's name """
+        cls.logger.info('Processing looking for name %s', supplier_name)
+        try:
+            return cls.objects.get(supplierName=supplier_name)
+        except DoesNotExist:
+            return None
+
 
 
 """
