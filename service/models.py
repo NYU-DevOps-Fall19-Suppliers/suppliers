@@ -21,6 +21,7 @@ class Supplier(Document):
     app = None
 
     # Table Schema
+    supplierID = StringField(required=False)
     supplierName = StringField(required=True)
     address = StringField(required=False)
     productIdList = ListField(IntField(), required=False)
@@ -82,7 +83,7 @@ class Supplier(Document):
     @classmethod
     def delete(cla, supplier_id)
         """ Delete a promotions by it's ID """
-        cls.logger.info('Processing lookup for id %s', supplier_id)
+        cls.logger.info('Processing deleting for id %s', supplier_id)
         try:
             return cls.objects(id=supplier_id).delete()
         except DoesNotExist:

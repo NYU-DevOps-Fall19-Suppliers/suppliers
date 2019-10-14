@@ -16,6 +16,9 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
+
+from flask_mongoengine import MongoEngine
+from flask_mongoengine.wtf import model_form
 from service.models import Supplier, DataValidationError
 
 from . import app
@@ -98,26 +101,31 @@ def create_suppliers():
     This endpoint will create a Supplier based the data in the body that is posted
     """
     # app.logger.info('Request to create a supplier')
-    check_content_type('application/json')
+    # check_content_type('application/json')
     supplier = Supplier()
     data = request.get_json()
-    # supplier.deserialize(data)
-    # supplier.save()
-    # message = supplier.serialize()
+    supplier.deserialize(data)
+    supplier.save()
+    message = supplier.serialize()
     # location_url = url_for('get_suppliers', supplier_id=supplier.supplierID, _external=True)
     # return make_response(jsonify(message), status.HTTP_201_CREATED,
     #                     {
     #                         'Location': location_url
     #                     })
-    return "123"
+    return data
 
 @app.route('/')
 def index():
-    return "Welcome to supplier team!"
+    return make_response(jsonify(name = 'Supplier Demo REST API Service', 
+    version = '1.0', paths = url_for('list_suppliers', _external=True)), 
+    status.HTTP_200_OK)
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
-    return "list of suppliers"
+    app.logger.info('Request for supplier list')
+    suppliers = Supplier.all()
+    results = [supplier.serialize() for supplier in suppliers]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

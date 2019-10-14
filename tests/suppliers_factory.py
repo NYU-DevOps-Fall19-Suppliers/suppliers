@@ -9,10 +9,10 @@ class SupplierFactory(factory.Factory):
     """ Creates fake suppliers for tests. """
     class Meta:
          model = Supplier
-    #supplierID = factory.Sequence(lambda n: n)
-    supplierName = factory.Faker('company_name')
+    # supplierID = factory.Sequence(lambda n: n)
+    supplierName = FuzzyChoice(choices=['Walmart', 'Costco'])
     address = FuzzyChoice(choices=['NYC', 'LA', 'SF', 'Seattle'])
-    averageRateing = FuzzyChoice(choices=[1,2,3,4,5])
+    averageRating = FuzzyChoice(choices=[1,2,3,4,5])
 
 if __name__ == '__main__':
     for _ in range(10):
