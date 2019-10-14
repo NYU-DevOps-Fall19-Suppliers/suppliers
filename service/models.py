@@ -21,6 +21,7 @@ class Supplier(Document):
     app = None
 
     # Table Schema
+    supplierID = StringField(required=False)
     supplierName = StringField(required=True)
     address = StringField(required=False)
     productIdList = ListField(IntField(), required=False)
@@ -29,20 +30,19 @@ class Supplier(Document):
     def __repr__(self):
         return '<Supplier %r>' % (self.supplierName)
 
-    def save(self):
-        """
-        Saves a Supplier to the data store
-        """
-        supplier.logger.info('Saving %s', self.supplierName)
-        if not self.supplierID:
-            self.save()
+    # def save(self):
+    #     """
+    #     Saves a Supplier to the data store
+    #     """
+    #     Supplier.logger.info('Saving %s', self.supplierName)
+    #     self.save()
 
     def serialize(self):
         """ Serializes a Supplier into a dictionary """
-        return {"supplierID": self.supplierID,
-                "supplierNamee": self.supplierNamee,
+        return {"supplierName": self.supplierName,
                 "address": self.address,
-                "productIDList": self.productIDList}
+                "averageRating" : self.averageRating, 
+                "productIdList": self.productIdList}
 
     def deserialize(self, data):
         """
@@ -52,18 +52,23 @@ class Supplier(Document):
             data (dict): A dictionary containing the Supplier data
         """
         try:
-            self.supplierID = data['supplierID']
             self.supplierName = data['supplierName']
             self.address = data['address']
-            self.averageRatingy = data['averageRating']
+            self.averageRating = data['averageRating']
             # product = Product()
-            # self.productIDList = data['productIDList']
+            self.productIdList = data['productIdList']
         except KeyError as error:
             raise DataValidationError('Invalid supplier: missing ' + error.args[0])
         except TypeError as error:
             raise DataValidationError('Invalid supplier: body of request contained' \
                                       'bad or no data')
         return self
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the Suppliers in the database """
+        cls.logger.info('Processing all Suppliers')
+        return cls.objects()
 
     @classmethod
     def init_db(cls, app):
