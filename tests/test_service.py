@@ -109,16 +109,16 @@ class TestSupplierServer(unittest.TestCase):
         pass
 
     def test_get_supplier_not_found(self):
-        """ Get a Pet thats not found """
+        """ Get a supplier thats not found """
         pass
 
 
     def test_delete_supplier(self):
-        """ Delete a Pet """
+        """ Delete a supplier """
         pass
 
     def test_query_supplier_list_by_rating(self):
-        """ Query Pets by Category """
+        """ Query supplier by rating """
         pass
 
     # @patch('service.models.Pet.find_by_name')
