@@ -116,11 +116,16 @@ def create_suppliers():
 
 @app.route('/')
 def index():
-    return "Welcome to supplier team!"
+    return make_response(jsonify(name = 'Supplier Demo REST API Service', 
+    version = '1.0', paths = url_for('list_suppliers', _external=True)), 
+    status.HTTP_200_OK)
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
-    return "list of suppliers"
+    app.logger.info('Request for supplier list')
+    suppliers = Supplier.all()
+    results = [supplier.serialize() for supplier in suppliers]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

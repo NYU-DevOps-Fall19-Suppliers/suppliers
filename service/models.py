@@ -80,6 +80,12 @@ class Supplier(Document):
         db = connect('myDatabase')
         app.app_context().push()
         # db.create_all()
+    
+    @classmethod
+    def all(cls):
+        #This is a function to return all suppliers
+        cls.logger.info('Processing all suppliers')
+        return cls.objects()
 
 
 
