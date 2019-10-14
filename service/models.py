@@ -29,20 +29,19 @@ class Supplier(Document):
     def __repr__(self):
         return '<Supplier %r>' % (self.supplierName)
 
-    def save(self):
-        """
-        Saves a Supplier to the data store
-        """
-        supplier.logger.info('Saving %s', self.supplierName)
-        if not self.supplierID:
-            self.save()
+    # def save(self):
+    #     """
+    #     Saves a Supplier to the data store
+    #     """
+    #     Supplier.logger.info('Saving %s', self.supplierName)
+    #     self.save()
 
     def serialize(self):
         """ Serializes a Supplier into a dictionary """
-        return {"supplierID": self.supplierID,
-                "supplierNamee": self.supplierNamee,
+        return {"supplierName": self.supplierName,
                 "address": self.address,
-                "productIDList": self.productIDList}
+                "averageRating" : self.averageRating, 
+                "productIdList": self.productIdList}
 
     def deserialize(self, data):
         """
@@ -51,12 +50,11 @@ class Supplier(Document):
             data (dict): A dictionary containing the Supplier data
         """
         try:
-            self.supplierID = data['supplierID']
             self.supplierName = data['supplierName']
             self.address = data['address']
-            self.averageRatingy = data['averageRating']
+            self.averageRating = data['averageRating']
             # product = Product()
-            # self.productIDList = data['productIDList']
+            self.productIdList = data['productIdList']
         except KeyError as error:
             raise DataValidationError('Invalid supplier: missing ' + error.args[0])
         except TypeError as error:
@@ -74,6 +72,21 @@ class Supplier(Document):
         db = connect('myDatabase')
         app.app_context().push()
         # db.create_all()
+    
+    @classmethod
+    def all(cls):
+        #This is a function to return all suppliers
+        cls.logger.info('Processing all suppliers')
+        return cls.objects()
+
+    @classmethod
+    def delete(cla, supplier_id)
+        """ Delete a promotions by it's ID """
+        cls.logger.info('Processing lookup for id %s', supplier_id)
+        try:
+            return cls.objects(id=supplier_id).delete()
+        except DoesNotExist:
+            return None
 
 
 
