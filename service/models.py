@@ -3,7 +3,6 @@ from flask import Flask
 from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
 
 
-
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
@@ -67,7 +66,7 @@ class Supplier(Document):
 
     @classmethod
     def init_db(cls, app):
-        """ Initializes the database session """       
+        """ Initializes the database session """
         cls.logger.info('Initializing database')
         cls.app = app
         # This is where we initialize mongoDB from the Flask app
@@ -75,13 +74,24 @@ class Supplier(Document):
         db = connect('myDatabase')
         app.app_context().push()
         # db.create_all()
-    
+
     @classmethod
     def all(cls):
         #This is a function to return all suppliers
         cls.logger.info('Processing all suppliers')
         return cls.objects()
 
+
+    @classmethod
+    def find(cls, supplier_id):
+        """Retrieves a single supplier with a given id (supplierID) """
+
+        cls.logger.info('Getting supplier with id: %s'.format(supplier_id))
+
+        try:
+            return cls.objects(id=supplier_id)
+        except DoesNotExist:
+            return None
 
 
 """

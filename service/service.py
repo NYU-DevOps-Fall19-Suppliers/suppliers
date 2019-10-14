@@ -20,7 +20,6 @@ from service.models import Supplier, DataValidationError
 
 from . import app
 
-
 # server = Flask(__name__)
 # server.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
 # mongo = PyMongo(server)
@@ -82,10 +81,13 @@ def internal_server_error(error):
                    message=message), status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
+######################################################################
+# GET A SUPPLIER
+######################################################################
 
 @app.route('/suppliers/<int:supplierID>', methods = ['GET'])
 def read(supplierID):
-	return str(supplierID)
+	return supplier.find(supplierID)
 
 ######################################################################
 # ADD A NEW SUPPLIER
@@ -113,8 +115,8 @@ def create_suppliers():
 
 @app.route('/')
 def index():
-    return make_response(jsonify(name = 'Supplier Demo REST API Service', 
-    version = '1.0', paths = url_for('list_suppliers', _external=True)), 
+    return make_response(jsonify(name = 'Supplier Demo REST API Service',
+    version = '1.0', paths = url_for('list_suppliers', _external=True)),
     status.HTTP_200_OK)
 
 @app.route('/suppliers', methods = ['GET'])
