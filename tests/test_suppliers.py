@@ -22,6 +22,7 @@ from mongoengine.connection import disconnect
 ######################################################################
 class TestSuppliers(unittest.TestCase):
     """ Test Cases for Suppliers """
+    db = None
 
     @classmethod
     def setUpClass(cls):
@@ -36,14 +37,15 @@ class TestSuppliers(unittest.TestCase):
 
     def setUp(self):      
         disconnect('default')
+        global db
         db = connect('mydatabase')
         #db.drop_database('mydatabase')
         # self.app = app.test_client()
         db.drop_database('mydatabase')
 
     def tearDown(self):
+        db.drop_database('mydatabase')
         disconnect('mydatabase')
-        #db.drop_database('mydatabase')
 
     def test_serialize_a_supplier(self):
     #     """ Test serialization of a Supplier """
