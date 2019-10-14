@@ -119,7 +119,10 @@ def index():
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
-    return "list of suppliers"
+    app.logger.info('Request for supplier list')
+    suppliers = Supplier.all()
+    results = [supplier.serialize() for supplier in suppliers]
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
