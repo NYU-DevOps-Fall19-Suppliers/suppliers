@@ -21,7 +21,6 @@ class Supplier(Document):
     app = None
 
     # Table Schema
-    supplierID = StringField(required=False)
     supplierName = StringField(required=True)
     address = StringField(required=False)
     productIdList = ListField(IntField(), required=False)
@@ -69,7 +68,6 @@ class Supplier(Document):
         cls.logger.info('Initializing database')
         cls.app = app
         # This is where we initialize mongoDB from the Flask app
-        # db.init_app(app)
         db = connect('myDatabase')
         app.app_context().push()
         # db.create_all()
@@ -82,7 +80,7 @@ class Supplier(Document):
 
     @classmethod
     def delete(cla, supplier_id)
-        """ Delete a promotions by it's ID """
+        """ Delete a supplier by it's ID """
         cls.logger.info('Processing deleting for id %s', supplier_id)
         try:
             return cls.objects(id=supplier_id).delete()
