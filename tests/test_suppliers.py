@@ -110,3 +110,14 @@ class TestSuppliers(unittest.TestCase):
     # def test_find_supplier(self):
         """ Find a supplier by ID """
         # pass
+    
+    def test_all(self):
+        Supplier(supplierName="Walmart", address="NY", averageRating=5, productIdList = [1,2,3]).save()
+        Supplier(supplierName="Target", address="CA", averageRating=2, productIdList = [1,3,4,6]).save()
+        Supplier(supplierName="Wholefood", address="CA", averageRating=2, productIdList = [1,3,4,6]).save()
+        suppliers = Supplier.all()
+        self.assertEqual(len(suppliers), 3)
+        self.assertEqual(suppliers[0].supplierName, 'Walmart')
+        self.assertEqual(suppliers[1].supplierName, 'Target')
+        self.assertEqual(suppliers[2].supplierName, 'Wholefood')
+        """ Return a list of suppliers """

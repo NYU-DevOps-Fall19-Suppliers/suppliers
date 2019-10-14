@@ -65,11 +65,10 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_index(self):
         """ Test the Home Page """
-        # resp = self.app.get('/')
-        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        # data = resp.get_json()
-        # self.assertEqual(data['SupplierName'], 'Pet Demo REST API Service')
-        # pass
+        resp = self.app.get('/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data['name'], 'Supplier Demo REST API Service')
 
     def test_create_supplier(self):
         # """ Create a new supplier """
@@ -102,6 +101,7 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_get_supplier_list(self):
         """ Get a list of suppliers """
+
         pass
 
     def test_get_supplier(self):
