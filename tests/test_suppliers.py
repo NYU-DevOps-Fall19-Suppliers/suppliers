@@ -9,6 +9,11 @@ Test cases can be run with:
 import unittest
 import os
 from werkzeug.exceptions import NotFound
+from service.models import Supplier, DataValidationError
+from service import app
+# from flask_mongoengine import MongoEngine
+from mongoengine import connect
+from mongoengine.connection import disconnect
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
 
@@ -16,42 +21,99 @@ from werkzeug.exceptions import NotFound
 #  T E S T   C A S E S
 ######################################################################
 class TestSuppliers(unittest.TestCase):
-    """ Test Cases for Pets """
+    """ Test Cases for Suppliers """
+    db = None
 
     @classmethod
     def setUpClass(cls):
         """ These run once per Test suite """
-        # app.debug = False
+        app.debug = False
         # Set up the test database
-        # app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
-        a = 1
+
 
     @classmethod
     def tearDownClass(cls):
         pass
 
-    def setUp(self):
-        # Pet.init_db(app)
-        # db.drop_all()    # clean up the last tests
-        # db.create_all()  # make our sqlalchemy tables
-        a = 1
+    def setUp(self):      
+        disconnect('default')
+        global db
+        db = connect('mydatabase')
+        #db.drop_database('mydatabase')
+        # self.app = app.test_client()
+        db.drop_database('mydatabase')
 
     def tearDown(self):
-        # db.session.remove()
-        # db.drop_all()
+        db.drop_database('mydatabase')
+        disconnect('mydatabase')
+
+    def test_serialize_a_supplier(self):
+    #     """ Test serialization of a Supplier """
+    #     supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+    #     data = supplier.serialize()
+    #     self.assertNotEqual(data, None)
+    #     self.assertIn('supplierID', data)
+    #     self.assertEqual(data['supplierID'], None)
+    #     self.assertIn('supplierName', data)
+    #     self.assertEqual(data['supplierName'], "Walmart")
+    #     self.assertIn('address', data)
+    #     self.assertEqual(data['address'], "NYC")
+    #     self.assertIn('averageRating', data)
+    #     self.assertEqual(data['averageRating'], 5)
+        pass
+
+    def test_deserialize_a_pet(self):
+    #     """ Test deserialization of a Supplier """
+    #     data = {"supplierID": 1, supplierName:"Walmart", address:"NYC", averageRating:5, productIdList : [1,2,3]}
+    #     supplier = Supplier()
+    #     supplier.deserialize(data)
+    #     self.assertNotEqual(supplier, None)
+    #     self.assertEqual(supplier.supplierID, None)
+    #     self.assertEqual(supplier.supplierName, "Walmart")
+    #     self.assertEqual(supplier.address, "NYC")
+    #     self.assertEqual(supplier.averageRating, 5)
+    #     self.assertEqual(supplier.productIdList, [1,2,3])
         pass
 
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """
-        pass
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+        self.assertTrue(supplier != None)
+        self.assertEqual(supplier.supplierName, "Walmart")
+        self.assertEqual(supplier.address, "NYC")
+        self.assertEqual(supplier.averageRating, 5)
+        self.assertEqual(supplier.productIdList, [1,2,3])
 
     def test_add_a_supplier(self):
         """ Create a supplier and add it to the database """
+        # suppliers = Supplier.all()
+        # self.assertEqual(suppliers, [])
+        # supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+        # self.assertTrue(supplier != None)
+        # self.assertEqual(supplier.supplierID, None)
+        # supplier.save()
+        # # Asert that it was assigned an id and shows up in the database
+        # self.assertEqual(supplier.id, 1)
+        # suppliers = Supplier.all()
+        # self.assertEqual(len(suppliers), 1)
         pass
 
- 
+    def test_update_a_supplier(self):
+    #     """ Update a supplier """
+    #     supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+    #     supplier.save()
+    #     self.assertEqual(supplier.supplierID, 1)
+    #     # Change it an save it
+    #     supplier.supplierName = "Costco"
+    #     supplier.save()
+    #     self.assertEqual(supplier.supplierID, 1)
+    #     # Fetch it back and make sure the id hasn't changed
+    #     # but the data did change
+    #     suppliers = Supplier.all()
+    #     self.assertEqual(len(suppliers), 1)
+    #     self.assertEqual(suppliers[0].supplierName, "Walmart")
+        pass
+
     def test_find_supplier(self):
         """ Find a supplier by ID """
         pass
-
- 

@@ -3,16 +3,16 @@ Test Factory to make fake objects for testing
 """
 import factory
 from factory.fuzzy import FuzzyChoice
-# from service.models import Pet
+from service.models import Supplier
 
 class SupplierFactory(factory.Factory):
     """ Creates fake suppliers for tests. """
-    # class Meta:
-    #      model = supplier
-    id = factory.Sequence(lambda n: n)
-    # name = factory.Faker('first_name')
-    # category = FuzzyChoice(choices=['dog', 'cat', 'bird', 'fish'])
-    # available = FuzzyChoice(choices=[True, False])
+    class Meta:
+         model = Supplier
+    #supplierID = factory.Sequence(lambda n: n)
+    supplierName = factory.Faker('company_name')
+    address = FuzzyChoice(choices=['NYC', 'LA', 'SF', 'Seattle'])
+    averageRateing = FuzzyChoice(choices=[1,2,3,4,5])
 
 if __name__ == '__main__':
     for _ in range(10):
