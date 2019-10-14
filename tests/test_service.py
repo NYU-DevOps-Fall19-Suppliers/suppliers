@@ -56,7 +56,7 @@ class TestSupplierServer(unittest.TestCase):
             resp = self.app.post('/suppliers',
                                  json=test_supplier.serialize(),
                                  content_type='application/json')
-            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test pet')
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
             new_supplier = resp.get_json()
             test_supplier.supplierID = new_supplier['supplierID']
             suppliers.append(test_supplier)
@@ -101,9 +101,11 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_get_supplier_list(self):
         """ Get a list of suppliers """
+        self._create_suppliers(2)
         resp = self.app.get('/suppliers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
+        self.assertEqual(len(data), 2)
         pass
 
     def test_get_supplier(self):

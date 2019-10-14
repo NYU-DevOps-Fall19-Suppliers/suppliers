@@ -112,12 +112,10 @@ class TestSuppliers(unittest.TestCase):
         # pass
     
     def test_all(self):
-        Supplier(supplierName="Walmart", address="NY", averageRating=5, productIdList = [1,2,3]).save()
-        Supplier(supplierName="Target", address="CA", averageRating=2, productIdList = [1,3,4,6]).save()
-        Supplier(supplierName="Wholefood", address="CA", averageRating=2, productIdList = [1,3,4,6]).save()
+        Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3]).save()
+        Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = [1,3,4]).save()
         suppliers = Supplier.all()
-        self.assertEqual(len(suppliers), 3)
+        self.assertEqual(len(suppliers), 2)
         self.assertEqual(suppliers[0].supplierName, 'Walmart')
-        self.assertEqual(suppliers[1].supplierName, 'Target')
-        self.assertEqual(suppliers[2].supplierName, 'Wholefood')
+        self.assertEqual(suppliers[1].supplierName, 'Costco')
         """ Return a list of suppliers """
