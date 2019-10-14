@@ -16,9 +16,6 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-
-from flask_mongoengine import MongoEngine
-from flask_mongoengine.wtf import model_form
 from service.models import Supplier, DataValidationError
 
 from . import app

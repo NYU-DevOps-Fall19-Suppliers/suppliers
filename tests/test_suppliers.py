@@ -13,6 +13,7 @@ from service.models import Supplier, DataValidationError
 from service import app
 # from flask_mongoengine import MongoEngine
 from mongoengine import connect
+from mongoengine.connection import disconnect
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
 
@@ -34,14 +35,15 @@ class TestSuppliers(unittest.TestCase):
         pass
 
     def setUp(self):      
+        disconnect('default')
         db = connect('mydatabase')
-        db.drop_database('mydatabase')
+        #db.drop_database('mydatabase')
         # self.app = app.test_client()
-        # db.drop_database('test')
+        db.drop_database('mydatabase')
 
     def tearDown(self):
-        db.disconnect('mydatabase')
-        db.drop_database('mydatabase')
+        disconnect('mydatabase')
+        #db.drop_database('mydatabase')
 
     def test_serialize_a_supplier(self):
     #     """ Test serialization of a Supplier """
@@ -75,7 +77,6 @@ class TestSuppliers(unittest.TestCase):
         """ Create a supplier and assert that it exists """
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
         self.assertTrue(supplier != None)
-        self.assertEqual(supplier.supplierID, None)
         self.assertEqual(supplier.supplierName, "Walmart")
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)

@@ -1,8 +1,7 @@
 import logging
 from flask import Flask
-# from flask_mongoengine import MongoEngine
 from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
-# from flask_mongoengine.wtf import model_form
+
 
 
 class DataValidationError(Exception):
@@ -22,7 +21,6 @@ class Supplier(Document):
     app = None
 
     # Table Schema
-    supplierID = IntField(required=True)
     supplierName = StringField(required=True)
     address = StringField(required=False)
     productIdList = ListField(IntField(), required=False)

@@ -15,14 +15,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 's3cr3t-key-shhhh')
 
 # Create Flask application
 app = Flask(__name__)
-app.config['MONGODB_SETTINGS'] = {'host': DATABASE_URI}
+# app.config['MONGODB_SETTINGS'] = {'host': DATABASE_URI}
 app.config['SECRET_KEY'] = SECRET_KEY
-# app.config['MONGODB_SETTINGS'] = {
-#     'db': 'myDatabase',
-#     'host': '127.0.0.1',
-#     'port': 27017
-
-# }
+app.config['MONGODB_SETTINGS'] = {
+    'db': 'myDatabase',
+    'host': '127.0.0.1',
+    'port': 27017
+}
 
 # Import the rutes After the Flask app is created
 from service import service, models
