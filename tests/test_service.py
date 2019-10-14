@@ -12,9 +12,9 @@ import os
 import logging
 from flask_api import status    # HTTP Status Codes
 from unittest.mock import MagicMock, patch
-from service.models import Supplier, DataValidationError, db
+from service.models import Supplier, DataValidationError
 from .suppliers_factory import SupplierFactory
-from service.service import app, init_db, initialize_logging
+from service.service import app, init_db #, initialize_logging
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 # DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')

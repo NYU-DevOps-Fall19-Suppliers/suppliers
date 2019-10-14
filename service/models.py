@@ -1,7 +1,7 @@
 import logging
 from flask import Flask
 # from flask_mongoengine import MongoEngine
-from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
+from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect, disconnect
 # from flask_mongoengine.wtf import model_form
 
 
@@ -66,6 +66,12 @@ class Supplier(Document):
             raise DataValidationError('Invalid supplier: body of request contained' \
                                       'bad or no data')
         return self
+
+    @classmethod
+    def all(cls):
+        """ Returns all of the Suppliers in the database """
+        cls.logger.info('Processing all Suppliers')
+        return cls.query.all()
 
     @classmethod
     def init_db(cls, app):

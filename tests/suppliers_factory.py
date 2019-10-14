@@ -10,7 +10,7 @@ class SupplierFactory(factory.Factory):
     class Meta:
          model = Supplier
     supplierID = factory.Sequence(lambda n: n)
-    supplierName = factory.Faker('company_name')
+    supplierName = factory.Faker('Walmart')
     address = FuzzyChoice(choices=['NYC', 'LA', 'SF', 'Seattle'])
     averageRateing = FuzzyChoice(choices=[1,2,3,4,5])
 

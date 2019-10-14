@@ -12,7 +12,7 @@ from werkzeug.exceptions import NotFound
 from service.models import Supplier, DataValidationError
 from service import app
 # from flask_mongoengine import MongoEngine
-from mongoengine import connect
+from mongoengine import connect, disconnect
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
 
@@ -26,24 +26,24 @@ class TestSuppliers(unittest.TestCase):
     def setUpClass(cls):
         """ These run once per Test suite """
         app.debug = False
-        # Set up the test database
 
 
     @classmethod
     def tearDownClass(cls):
         pass
 
-    def setUp(self):      
-        db = connect('mydatabase')
-        db.drop_database('mydatabase')
+    def setUp(self):   
+        # disconnect('default')  
+        db = connect('myDatabase')
+        db.drop_database('myDatabase')
         # self.app = app.test_client()
         # db.drop_database('test')
 
     def tearDown(self):
-        db.disconnect('mydatabase')
-        db.drop_database('mydatabase')
+        db = connect('myDatabase')
+        db.drop_database('myDatabase')
 
-    def test_serialize_a_supplier(self):
+    # def test_serialize_a_supplier(self):
     #     """ Test serialization of a Supplier """
     #     supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
     #     data = supplier.serialize()
@@ -56,20 +56,19 @@ class TestSuppliers(unittest.TestCase):
     #     self.assertEqual(data['address'], "NYC")
     #     self.assertIn('averageRating', data)
     #     self.assertEqual(data['averageRating'], 5)
-        pass
+        # pass
 
-    def test_deserialize_a_pet(self):
-    #     """ Test deserialization of a Supplier """
-    #     data = {"supplierID": 1, supplierName:"Walmart", address:"NYC", averageRating:5, productIdList : [1,2,3]}
-    #     supplier = Supplier()
-    #     supplier.deserialize(data)
-    #     self.assertNotEqual(supplier, None)
-    #     self.assertEqual(supplier.supplierID, None)
-    #     self.assertEqual(supplier.supplierName, "Walmart")
-    #     self.assertEqual(supplier.address, "NYC")
-    #     self.assertEqual(supplier.averageRating, 5)
-    #     self.assertEqual(supplier.productIdList, [1,2,3])
-        pass
+    def test_deserialize_a_supplier(self):
+        """ Test deserialization of a Supplier """
+        data = {"supplierID": 1, supplierName: "Walmart", address:"NYC", averageRating:5, productIdList : [1,2,3]}
+        supplier = Supplier()
+        supplier.deserialize(data)
+        self.assertNotEqual(supplier, None)
+        self.assertEqual(supplier.supplierID, None)
+        self.assertEqual(supplier.supplierName, "Walmart")
+        self.assertEqual(supplier.address, "NYC")
+        self.assertEqual(supplier.averageRating, 5)
+        self.assertEqual(supplier.productIdList, [1,2,3])
 
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """
@@ -81,7 +80,7 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.averageRating, 5)
         self.assertEqual(supplier.productIdList, [1,2,3])
 
-    def test_add_a_supplier(self):
+    # def test_add_a_supplier(self):
         """ Create a supplier and add it to the database """
         # suppliers = Supplier.all()
         # self.assertEqual(suppliers, [])
@@ -93,9 +92,9 @@ class TestSuppliers(unittest.TestCase):
         # self.assertEqual(supplier.id, 1)
         # suppliers = Supplier.all()
         # self.assertEqual(len(suppliers), 1)
-        pass
+        # pass
 
-    def test_update_a_supplier(self):
+    # def test_update_a_supplier(self):
     #     """ Update a supplier """
     #     supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
     #     supplier.save()
@@ -109,8 +108,8 @@ class TestSuppliers(unittest.TestCase):
     #     suppliers = Supplier.all()
     #     self.assertEqual(len(suppliers), 1)
     #     self.assertEqual(suppliers[0].supplierName, "Walmart")
-        pass
+        # pass
 
-    def test_find_supplier(self):
+    # def test_find_supplier(self):
         """ Find a supplier by ID """
-        pass
+        # pass
