@@ -101,7 +101,9 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_get_supplier_list(self):
         """ Get a list of suppliers """
-
+        resp = self.app.get('/suppliers')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
         pass
 
     def test_get_supplier(self):
