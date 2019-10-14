@@ -12,7 +12,9 @@ import os
 import logging
 from flask_api import status    # HTTP Status Codes
 from unittest.mock import MagicMock, patch
+from service.models import Supplier, DataValidationError #, db
 from .suppliers_factory import SupplierFactory
+from service.service import app, init_db#, initialize_logging
 
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 # DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
@@ -42,11 +44,55 @@ class TestPetServer(unittest.TestCase):
         pass
 
     def _create_suppliers(self, count):
-        """ Factory method to create pets in bulk """
-        return 0
+        """ Factory method to create suppliers in bulk """
+        # suppliers = []
+        # for _ in range(count):
+        #     test_supplier = SupplierFactory()
+        #     resp = self.app.post('/suppliers',
+        #                          json=test_supplier.serialize(),
+        #                          content_type='application/json')
+        #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test pet')
+        #     new_supplier = resp.get_json()
+        #     test_supplier.supplierID = new_supplier['supplierID']
+        #     suppliers.append(test_supplier)
+        # return suppliers
+        pass
 
     def test_index(self):
         """ Test the Home Page """
+        # resp = self.app.get('/')
+        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # data = resp.get_json()
+        # self.assertEqual(data['name'], 'Pet Demo REST API Service')
+        pass
+
+    def test_create_supplier(self):
+        """ Create a new supplier """
+        # test_supplier = PetFactory()
+        # resp = self.app.post('/suppliers',
+        #                      json=test_supplier.serialize(),
+        #                      content_type='application/json')
+        # self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # # Make sure location header is set
+        # location = resp.headers.get('Location', None)
+        # self.assertTrue(location != None)
+        # # Check the data is correct
+        # new_supplier = resp.get_json()
+        # self.assertEqual(new_supplier['supplierName'], test_supplier.supplierName, "SupplierNames do not match")
+        # self.assertEqual(new_supplier['address'], test_supplier.address, "Addresses do not match")
+        # self.assertEqual(new_supplier['averageRating'], test_supplier.averageRating, "AverageRatings does not match")
+        # # Check that the location header was correct
+        # resp = self.app.get(location,
+        #                     content_type='application/json')
+        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # new_supplier = resp.get_json()
+        # self.assertEqual(new_supplier['supplierName'], test_supplier.supplierName, "SupplierNames do not match")
+        # self.assertEqual(new_supplier['address'], test_supplier.address, "Address do not match")
+        # self.assertEqual(new_supplier['averageRating'], test_supplier.averageRating, "AverageRating does not match")
+        pass
+
+    def test_update_supplier(self):
+        """ Update an existing Pet """
         pass
 
     def test_get_supplier_list(self):
@@ -61,13 +107,6 @@ class TestPetServer(unittest.TestCase):
         """ Get a Pet thats not found """
         pass
 
-    def test_create_supplier(self):
-        """ Create a new supplier """
-        pass
-
-    def test_update_supplier(self):
-        """ Update an existing Pet """
-        pass
 
     def test_delete_supplier(self):
         """ Delete a Pet """

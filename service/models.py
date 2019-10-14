@@ -1,4 +1,3 @@
-  
 import logging
 from flask import Flask
 from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect

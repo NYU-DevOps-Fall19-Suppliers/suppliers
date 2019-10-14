@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_pymongo import PyMongo
+from flask import request
 
 
 
@@ -11,6 +12,10 @@ mongo = PyMongo(server)
 # PyMongo connects to the MongoDB server running on port 27017 on localhost,
 # to the database named myDatabase.
 # This database is exposed as the db attribute. (mongo.db)
+
+@server.route('/suppliers', methods = ['GET'])
+def query():
+    return "get params using supplier.request"
 
 @server.route('/suppliers/<int:supplierID>', methods = ['GET'])
 def read(supplierID):
