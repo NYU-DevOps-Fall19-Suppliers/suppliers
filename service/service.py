@@ -113,7 +113,9 @@ def create_suppliers():
 
 @app.route('/')
 def index():
-    return "Welcome to supplier team!"
+    return make_response(jsonify(name = 'Supplier Demo REST API Service', 
+    version = '1.0', paths = url_for('list_suppliers', _external=True)), 
+    status.HTTP_200_OK)
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
