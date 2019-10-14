@@ -12,25 +12,26 @@ import os
 import logging
 from flask_api import status    # HTTP Status Codes
 from unittest.mock import MagicMock, patch
-from service.models import Supplier, DataValidationError
+from service.models import Supplier, DataValidationError #, db
 from .suppliers_factory import SupplierFactory
-from service.service import app, init_db #, initialize_logging
-
+from service.service import app, init_db#, initialize_logging
+from mongoengine import connect
+from mongoengine.connection import disconnect
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 # DATABASE_URI = os.getenv('DATABASE_URI', 'postgres://postgres:passw0rd@localhost:5432/postgres')
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestPetServer(unittest.TestCase):
-    """ Pet Server Tests """
+class TestSupplierServer(unittest.TestCase):
+    """ Supplier Server Tests """
 
     @classmethod
     def setUpClass(cls):
         """ Run once before all tests """
-        # app.debug = False
+        app.debug = False
         # initialize_logging(logging.INFO)
-        # # Set up the test database
+        # Set up the test database
         # app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 
     @classmethod
@@ -39,23 +40,27 @@ class TestPetServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
+        disconnect('default')
+        db = connect('mydatabase')
+        db.drop_database('mydatabase')
+        self.app = app.test_client()
 
     def tearDown(self):
-        pass
+        disconnect('mydatabase')
 
     def _create_suppliers(self, count):
         """ Factory method to create suppliers in bulk """
-        # suppliers = []
-        # for _ in range(count):
-        #     test_supplier = SupplierFactory()
-        #     resp = self.app.post('/suppliers',
-        #                          json=test_supplier.serialize(),
-        #                          content_type='application/json')
-        #     self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test pet')
-        #     new_supplier = resp.get_json()
-        #     test_supplier.supplierID = new_supplier['supplierID']
-        #     suppliers.append(test_supplier)
-        # return suppliers
+        suppliers = []
+        for _ in range(count):
+            test_supplier = SupplierFactory()
+            resp = self.app.post('/suppliers',
+                                 json=test_supplier.serialize(),
+                                 content_type='application/json')
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test pet')
+            new_supplier = resp.get_json()
+            test_supplier.supplierID = new_supplier['supplierID']
+            suppliers.append(test_supplier)
+        return suppliers
         pass
 
     def test_index(self):
@@ -63,16 +68,16 @@ class TestPetServer(unittest.TestCase):
         # resp = self.app.get('/')
         # self.assertEqual(resp.status_code, status.HTTP_200_OK)
         # data = resp.get_json()
-        # self.assertEqual(data['name'], 'Pet Demo REST API Service')
-        pass
+        # self.assertEqual(data['SupplierName'], 'Pet Demo REST API Service')
+        # pass
 
     def test_create_supplier(self):
-        """ Create a new supplier """
-        # test_supplier = PetFactory()
+        # """ Create a new supplier """
+        # test_supplier = SupplierFactory()
         # resp = self.app.post('/suppliers',
         #                      json=test_supplier.serialize(),
         #                      content_type='application/json')
-        # self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # # self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # # Make sure location header is set
         # location = resp.headers.get('Location', None)
         # self.assertTrue(location != None)
