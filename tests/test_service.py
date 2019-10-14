@@ -97,7 +97,7 @@ class TestSupplierServer(unittest.TestCase):
         pass
 
     def test_update_supplier(self):
-        """ Update an existing Pet """
+        """ Update an existing supplier """
         pass
 
     def test_get_supplier_list(self):
