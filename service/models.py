@@ -21,7 +21,6 @@ class Supplier(Document):
     app = None
 
     # Table Schema
-    supplierID = StringField(required=False)
     supplierName = StringField(required=True)
     address = StringField(required=False)
     productIdList = ListField(IntField(), required=False)
@@ -47,7 +46,6 @@ class Supplier(Document):
     def deserialize(self, data):
         """
         Deserializes a Supplier from a dictionary
-
         Args:
             data (dict): A dictionary containing the Supplier data
         """
@@ -65,18 +63,11 @@ class Supplier(Document):
         return self
 
     @classmethod
-    def all(cls):
-        """ Returns all of the Suppliers in the database """
-        cls.logger.info('Processing all Suppliers')
-        return cls.objects()
-
-    @classmethod
     def init_db(cls, app):
         """ Initializes the database session """       
         cls.logger.info('Initializing database')
         cls.app = app
         # This is where we initialize mongoDB from the Flask app
-        # db.init_app(app)
         db = connect('myDatabase')
         app.app_context().push()
         # db.create_all()
@@ -86,6 +77,15 @@ class Supplier(Document):
         #This is a function to return all suppliers
         cls.logger.info('Processing all suppliers')
         return cls.objects()
+
+    @classmethod
+    def delete(cla, supplier_id)
+        """ Delete a supplier by it's ID """
+        cls.logger.info('Processing deleting for id %s', supplier_id)
+        try:
+            return cls.objects(id=supplier_id).delete()
+        except DoesNotExist:
+            return None
 
 
 
