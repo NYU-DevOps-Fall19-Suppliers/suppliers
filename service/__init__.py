@@ -15,11 +15,14 @@ SECRET_KEY = os.getenv('SECRET_KEY', 's3cr3t-key-shhhh')
 
 # Create Flask application
 app = Flask(__name__)
-app.config['MONGODB_SETTINGS'] = {
-    'db': 'myDatabase',
-    'host': '127.0.0.1',
-    'port': 27017
-}
+app.config['MONGODB_SETTINGS'] = {'host': DATABASE_URI}
+app.config['SECRET_KEY'] = SECRET_KEY
+# app.config['MONGODB_SETTINGS'] = {
+#     'db': 'myDatabase',
+#     'host': '127.0.0.1',
+#     'port': 27017
+
+# }
 
 # Import the rutes After the Flask app is created
 from service import service, models
@@ -28,11 +31,11 @@ from service import service, models
 # service.initialize_logging()
 
 app.logger.info(70 * '*')
-app.logger.info('  P E T   S E R V I C E   R U N N I N G  '.center(70, '*'))
+app.logger.info('  SUPPLIERS   S E R V I C E   R U N N I N G  '.center(70, '*'))
 app.logger.info(70 * '*')
 
 try:
-    service.init_db()  # make our sqlalchemy tables
+    service.init_db()
 except Exception as error:
     app.logger.critical('%s: Cannot continue', error)
     # gunicorn requires exit code 4 to stop spawning workers when they die

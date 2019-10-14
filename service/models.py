@@ -1,9 +1,9 @@
 import logging
 from flask import Flask
-from flask_mongoengine import MongoEngine
-from flask_mongoengine.wtf import model_form
+# from flask_mongoengine import MongoEngine
+from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
+# from flask_mongoengine.wtf import model_form
 
-db = MongoEngine()
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
@@ -14,7 +14,7 @@ class DataValidationError(Exception):
 #     """
 #     product_id = db.IntField(required=True)
 
-class Supplier(db.Document):
+class Supplier(Document):
     """
     Suppliers data schema: https://github.com/nyu-devops-fall19-suppliers/suppliers/issues/21
     """
@@ -22,11 +22,11 @@ class Supplier(db.Document):
     app = None
 
     # Table Schema
-    supplierID = db.IntField(required=True)
-    supplierName = db.StringField(required=True)
-    address = db.StringField(required=False)
-    productIdList = db.ListField(db.IntField(), required=False)
-    averageRating = db.IntField(required=False)
+    supplierID = IntField(required=True)
+    supplierName = StringField(required=True)
+    address = StringField(required=False)
+    productIdList = ListField(IntField(), required=False)
+    averageRating = IntField(required=False)
 
     def __repr__(self):
         return '<Supplier %r>' % (self.supplierName)
@@ -73,7 +73,8 @@ class Supplier(db.Document):
         cls.logger.info('Initializing database')
         cls.app = app
         # This is where we initialize mongoDB from the Flask app
-        db.init_app(app)
+        # db.init_app(app)
+        db = connect('myDatabase')
         app.app_context().push()
         # db.create_all()
 

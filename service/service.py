@@ -91,7 +91,7 @@ def read(supplierID):
 	return str(supplierID)
 
 ######################################################################
-# ADD A NEW PET
+# ADD A NEW SUPPLIER
 ######################################################################
 
 @app.route('/suppliers', methods = ['POST'])
@@ -101,7 +101,7 @@ def create_suppliers():
     This endpoint will create a Supplier based the data in the body that is posted
     """
     # app.logger.info('Request to create a supplier')
-    # check_content_type('application/json')
+    check_content_type('application/json')
     supplier = Supplier()
     data = request.get_json()
     # supplier.deserialize(data)
@@ -127,7 +127,7 @@ def list_suppliers():
 ######################################################################
 
 def init_db():
-    """ Initialies the SQLAlchemy app """
+    """ Initialies the mongoengine """
     global app
     Supplier.init_db(app)
 
