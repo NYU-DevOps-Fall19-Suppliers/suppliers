@@ -138,13 +138,17 @@ def index():
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
+    """ Route to list all suppliers """
     app.logger.info('Request for supplier list')
     suppliers = Supplier.all()
     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 @app.route('/suppliers/<string:productId>/recommend', methods = ['GET'])
 def action_recommend_product(productId):
-    return "A list of the best supplier(rating > 3.5) that supplies the product"
+    """ Route to recommend a list of suppliers given a product"""
+    app.logger.info('Recommend product')
+    suppliers = Supplier.action_make_recommendation(productId)
+    return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
