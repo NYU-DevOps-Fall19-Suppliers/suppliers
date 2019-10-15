@@ -91,6 +91,17 @@ def read(supplierID):
     return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 ######################################################################
+# DELETE A SUPPLIER
+######################################################################
+
+@app.route('/suppliers/<string:supplierID>', methods = ['DELETE'])
+def delete_a_supplier(supplierID):
+    """ Route to delete a supplier """
+    supplier = Supplier.find(supplierID)
+    if supplier:
+        supplier.delete()
+    return make_response('DELETED', status.HTTP_204_NO_CONTENT)
+######################################################################
 # ADD A NEW SUPPLIER
 ######################################################################
 
