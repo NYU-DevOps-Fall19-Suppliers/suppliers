@@ -94,10 +94,12 @@ def get_suppliers(supplierID):
 ######################################################################
 
 @app.route('/suppliers/<string:supplierID>', methods = ['DELETE'])
-def delete_supplier(supplierID):
+def delete_a_supplier(supplierID):
     """ Route to delete a supplier """
-    return supplier.delete(supplierID)
-
+    supplier = Supplier.find(supplierID)
+    if supplier:
+        supplier.delete()
+    return make_response('DELETED', status.HTTP_204_NO_CONTENT)
 ######################################################################
 # ADD A NEW SUPPLIER
 ######################################################################
