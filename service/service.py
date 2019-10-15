@@ -86,8 +86,8 @@ def internal_server_error(error):
 # GET A SUPPLIER
 ######################################################################
 
-@app.route('/suppliers/<int:supplierID>', methods = ['GET'])
-def read(supplierID):
+@app.route('/suppliers/<string:supplierID>', methods = ['GET'])
+def get_suppliers(supplierID):
 	return supplier.find(supplierID)
 
 ######################################################################
@@ -100,19 +100,19 @@ def create_suppliers():
     Creates a Supplier
     This endpoint will create a Supplier based the data in the body that is posted
     """
-    # app.logger.info('Request to create a supplier')
-    # check_content_type('application/json')
+    app.logger.info('Request to create a supplier')
+    check_content_type('application/json')
     supplier = Supplier()
     data = request.get_json()
-    supplier.deserialize(data)
+    supplier.from_json(data)
+    # supplier.deserialize(data)
     supplier.save()
-    message = supplier.serialize()
-    # location_url = url_for('get_suppliers', supplier_id=supplier.supplierID, _external=True)
-    # return make_response(jsonify(message), status.HTTP_201_CREATED,
-    #                     {
-    #                         'Location': location_url
-    #                     })
-    return data
+    # message = supplier.serialize()
+    location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED,
+                        {
+                            'Location': location_url
+                        })
 
 @app.route('/')
 def index():
@@ -130,10 +130,9 @@ def list_suppliers():
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
-@app.route('/suppliers/<int:supplier_id>', methods=['PUT'])
+@app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
 def update_suppliers(supplier_id):
     return str(supplier_id)
-
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -143,6 +142,13 @@ def init_db():
     """ Initialies the mongoengine """
     global app
     Supplier.init_db(app)
+
+def check_content_type(content_type):
+    """ Checks that the media type is correct """
+    if request.headers['Content-Type'] == content_type:
+        return
+    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+    abort(415, 'Content-Type must be {}'.format(content_type))
 
 # if __name__ == '__main__':
 #     app.run()

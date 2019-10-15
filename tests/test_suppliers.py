@@ -71,7 +71,7 @@ class TestSuppliers(unittest.TestCase):
 
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """
-        supplier = Supplier(supplierID=1, supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
         self.assertTrue(supplier != None)
         self.assertEqual(supplier.supplierName, "Walmart")
         self.assertEqual(supplier.address, "NYC")
@@ -84,12 +84,13 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(len(suppliers), 0)
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
         self.assertTrue(supplier != None)
-        self.assertEqual(supplier.supplierID, None)
+        self.assertEqual(supplier.id, None)
         supplier.save()
         # Asert that it was assigned an id and shows up in the database
         # self.assertEqual(supplier.id, 1)
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 1)
+        self.assertNotEqual(supplier.id, None)
 
     # def test_update_a_supplier(self):
     #     """ Update a supplier """
