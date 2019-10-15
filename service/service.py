@@ -112,7 +112,8 @@ def create_suppliers():
                                   'bad or no data')
     supplier = Supplier(**data)
     supplier.save()
-    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
+    location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED, {'location': location_url})
 
 @app.route('/')
 def index():
@@ -145,7 +146,6 @@ def update_suppliers(supplier_id):
         raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
     return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -160,7 +160,6 @@ def check_content_type(content_type):
     if request.headers['Content-Type'] != content_type:
         app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
         abort(415, 'Content-Type must be {}'.format(content_type))
-    
 
 # if __name__ == '__main__':
 #     app.run()
