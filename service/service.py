@@ -86,8 +86,9 @@ def internal_server_error(error):
 ######################################################################
 
 @app.route('/suppliers/<string:supplierID>', methods = ['GET'])
-def get_suppliers(supplierID):
-	return supplier.find(supplierID)
+def read(supplierID):
+    supplier = Supplier.find(supplierID)
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 ######################################################################
 # ADD A NEW SUPPLIER
@@ -126,7 +127,7 @@ def list_suppliers():
     suppliers = Supplier.all()
     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
-@app.route('/suppliers/<int:productId>/recommend', methods = ['GET'])
+@app.route('/suppliers/<string:productId>/recommend', methods = ['GET'])
 def action_recommend_product(productId):
     return "A list of the best supplier(rating > 3.5) that supplies the product"
 
@@ -135,7 +136,15 @@ def action_recommend_product(productId):
 ######################################################################
 @app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
 def update_suppliers(supplier_id):
-    return str(supplier_id)
+    app.logger.info('Request to update a supplier')
+    check_content_type('application/json')
+    data = request.get_json()
+    supplier = Supplier.find(supplier_id)
+    supplier.update(**data)
+    supplier.reload()
+    if not supplier:
+        raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

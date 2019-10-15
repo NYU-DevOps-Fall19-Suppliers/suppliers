@@ -90,9 +90,8 @@ class Supplier(Document):
             return None
 
     @classmethod
-
     def find_by_name(cls, supplier_name):
-        """ Find a supplier by it's name """
+        """ Find a supplier by its name """
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
             return cls.objects.get(supplierName=supplier_name)
@@ -107,7 +106,7 @@ class Supplier(Document):
         cls.logger.info('Getting supplier with id: %s'.format(supplier_id))
 
         try:
-            return cls.objects(id=supplier_id)
+            return cls.objects(id=supplier_id).first()
         except DoesNotExist:
             return None
 
