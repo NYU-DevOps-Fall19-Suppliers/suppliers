@@ -54,14 +54,13 @@ class TestSupplierServer(unittest.TestCase):
         for _ in range(count):
             test_supplier = SupplierFactory()
             resp = self.app.post('/suppliers',
-                                 json=test_supplier.serialize(),
+                                 json=test_supplier.to_json(),
                                  content_type='application/json')
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
             new_supplier = resp.get_json()
-            test_supplier.supplierID = new_supplier['supplierID']
+            test_supplier.id = new_supplier.id
             suppliers.append(test_supplier)
         return suppliers
-        pass
 
     def test_index(self):
         """ Test the Home Page """
@@ -72,20 +71,23 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_create_supplier(self):
         # """ Create a new supplier """
-        # test_supplier = SupplierFactory()
-        # resp = self.app.post('/suppliers',
-        #                      json=test_supplier.serialize(),
-        #                      content_type='application/json')
-        # # self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        # # Make sure location header is set
-        # location = resp.headers.get('Location', None)
-        # self.assertTrue(location != None)
-        # # Check the data is correct
-        # new_supplier = resp.get_json()
-        # self.assertEqual(new_supplier['supplierName'], test_supplier.supplierName, "SupplierNames do not match")
-        # self.assertEqual(new_supplier['address'], test_supplier.address, "Addresses do not match")
-        # self.assertEqual(new_supplier['averageRating'], test_supplier.averageRating, "AverageRatings does not match")
-        # # Check that the location header was correct
+        test_supplier = SupplierFactory()
+        self.assertNotEqual(test_supplier, None)
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        # Make sure location header is set
+        location = resp.headers.get('Location', None)
+        self.assertTrue(location != None)
+        # Check the data is correct
+        new_supplier = resp.get_json()
+        self.assertNotEqual(new_supplier, None)
+        self.assertNotEqual(test_supplier, None)
+        self.assertEqual(new_supplier['supplierName'], test_supplier.supplierName, "SupplierNames do not match")
+        self.assertEqual(new_supplier['address'], test_supplier.address, "Addresses do not match")
+        self.assertEqual(new_supplier['averageRating'], test_supplier.averageRating, "AverageRatings does not match")
+        # Check that the location header was correct
         # resp = self.app.get(location,
         #                     content_type='application/json')
         # self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -93,7 +95,6 @@ class TestSupplierServer(unittest.TestCase):
         # self.assertEqual(new_supplier['supplierName'], test_supplier.supplierName, "SupplierNames do not match")
         # self.assertEqual(new_supplier['address'], test_supplier.address, "Address do not match")
         # self.assertEqual(new_supplier['averageRating'], test_supplier.averageRating, "AverageRating does not match")
-        pass
 
     def test_update_supplier(self):
         """ Update an existing supplier """
