@@ -155,10 +155,10 @@ def update_a_supplier(supplier_id):
     check_content_type('application/json')
     data = request.get_json()
     supplier = Supplier.find(supplier_id)
-    supplier.update(**data)
-    supplier.reload()
     if not supplier:
         raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
+    supplier.update(**data)
+    supplier.reload()
     return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 ######################################################################

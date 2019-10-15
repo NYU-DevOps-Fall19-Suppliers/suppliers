@@ -60,8 +60,7 @@ class TestSupplierServer(unittest.TestCase):
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
 
             new_supplier = json.loads(resp.data)
-            test_supplier.id = new_supplier["_id"]["$oid"]
-            
+            test_supplier.id = new_supplier["_id"]["$oid"]            
             suppliers.append(test_supplier)
         return suppliers
 
@@ -111,11 +110,11 @@ class TestSupplierServer(unittest.TestCase):
         # update the supplier
         new_supplier = json.loads(resp.data)
         new_supplier['address'] = 'unknown'
-        resp = self.app.put('/suppliers/{}'.format(new_supplier['id']),
+        resp = self.app.put('/suppliers/{}'.format(new_supplier["_id"]["$oid"]),
                             json=new_supplier,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        updated_supplier = resp.get_json()
+        updated_supplier = json.loads(resp.data)
         self.assertEqual(updated_supplier['address'], 'unknown')
 
 
