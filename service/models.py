@@ -39,7 +39,7 @@ class Supplier(Document):
         """ Serializes a Supplier into a dictionary """
         return {"supplierName": self.supplierName,
                 "address": self.address,
-                "averageRating" : self.averageRating, 
+                "averageRating" : self.averageRating,
                 "productIdList": self.productIdList}
 
     def deserialize(self, data):
@@ -100,7 +100,7 @@ class Supplier(Document):
     def find(cls, supplier_id):
         """Retrieves a single supplier with a given id (supplierID) """
 
-        cls.logger.info('Getting supplier with id: %s'.format(supplier_id))
+        cls.logger.info('Getting supplier with id: {}'.format(supplier_id))
 
         try:
             return cls.objects(id=supplier_id)

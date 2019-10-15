@@ -88,7 +88,13 @@ def internal_server_error(error):
 
 @app.route('/suppliers/<int:supplierID>', methods = ['GET'])
 def read(supplierID):
-	return supplier.find(supplierID)
+
+    supplier = Supplier.find(supplierID)
+
+    if supplier != None:
+        return make_response(supplier.to_json(), status.HTTP_200_OK)
+    else:
+        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
 
 ######################################################################
 # ADD A NEW SUPPLIER
