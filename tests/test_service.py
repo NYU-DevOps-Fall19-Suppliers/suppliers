@@ -98,7 +98,23 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_update_supplier(self):
         """ Update an existing supplier """
-        pass
+        # create a supplier to update
+        test_supplier = SupplierFactory()
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the supplier
+        new_supplier = resp.get_json()
+        new_supplier['address'] = 'unknown'
+        resp = self.app.put('/suppliers/{}'.format(new_supplier['id']),
+                            json=new_supplier,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_supplier = resp.get_json()
+        self.assertEqual(updated_supplier['address'], 'unknown')
+
 
     def test_get_supplier_list(self):
         """ Get a list of suppliers """

@@ -13,7 +13,7 @@ class SupplierFactory(factory.Factory):
     supplierName = FuzzyChoice(choices=['Walmart', 'Costco', 'Ikea', 'Apple', 'Microsoft'])
     address = FuzzyChoice(choices=['NYC', 'LA', 'SF', 'Seattle'])
     averageRating = FuzzyChoice(choices=[1,2,3,4,5])
-    productIdList = FuzzyChoice(choices=[[1,2,3],[2,3,4,5]])
+    productIdList = FuzzyChoice(choices=[['1','2','3'],['2','3','4','5']])
 
 if __name__ == '__main__':
     for _ in range(10):
