@@ -1,6 +1,7 @@
 import logging
 from flask import Flask
 from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
+from mongoengine.queryset.visitor import Q
 
 
 class DataValidationError(Exception):
@@ -109,6 +110,26 @@ class Supplier(Document):
             return cls.objects(id=supplier_id).first()
         except DoesNotExist:
             return None
+
+    @classmethod
+    def find_by_product(cls, product_id):
+        """Retrieves a list of supplier with a given product id """
+        cls.logger.info("Getting suppliers with product id: %s".format(product_id))
+        return cls.objects(productIdList__in=product_id)
+
+    @classmethod
+    def find_by_rating(cls, rating):
+        """Retrieves a list of supplier with a given rating score """
+        cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
+        return cls.objects(averageRating__gte=3)
+
+    @classmethod
+    def action_make_recommendation(cls, product_id):
+        """Retrieves a list of supplier with a given rating score and product id """
+        cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
+        return cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
+
+
 
 
 """
