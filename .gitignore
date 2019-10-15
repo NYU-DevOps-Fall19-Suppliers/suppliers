@@ -1,6 +1,8 @@
 # Pesky OS metadata files that we don't need
 .DS_Store
 Thumbs.db
+.coverage
+*.pyc
 
 # Hidden Vagrant folder
 .vagrant/

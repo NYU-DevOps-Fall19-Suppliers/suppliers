@@ -56,7 +56,7 @@ class TestSupplierServer(unittest.TestCase):
             resp = self.app.post('/suppliers',
                                  json=test_supplier.serialize(),
                                  content_type='application/json')
-            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test pet')
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
             new_supplier = resp.get_json()
             test_supplier.supplierID = new_supplier['supplierID']
             suppliers.append(test_supplier)
@@ -65,11 +65,10 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_index(self):
         """ Test the Home Page """
-        # resp = self.app.get('/')
-        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        # data = resp.get_json()
-        # self.assertEqual(data['SupplierName'], 'Pet Demo REST API Service')
-        # pass
+        resp = self.app.get('/')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data['name'], 'Supplier Demo REST API Service')
 
     def test_create_supplier(self):
         # """ Create a new supplier """
@@ -97,11 +96,16 @@ class TestSupplierServer(unittest.TestCase):
         pass
 
     def test_update_supplier(self):
-        """ Update an existing Pet """
+        """ Update an existing supplier """
         pass
 
     def test_get_supplier_list(self):
         """ Get a list of suppliers """
+        self._create_suppliers(2)
+        resp = self.app.get('/suppliers')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
         pass
 
     def test_get_supplier(self):
@@ -109,16 +113,16 @@ class TestSupplierServer(unittest.TestCase):
         pass
 
     def test_get_supplier_not_found(self):
-        """ Get a Pet thats not found """
+        """ Get a supplier thats not found """
         pass
 
 
     def test_delete_supplier(self):
-        """ Delete a Pet """
+        """ Delete a supplier """
         pass
 
     def test_query_supplier_list_by_rating(self):
-        """ Query Pets by Category """
+        """ Query supplier by rating """
         pass
 
     # @patch('service.models.Pet.find_by_name')
