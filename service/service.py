@@ -127,6 +127,10 @@ def list_suppliers():
     results = [supplier.serialize() for supplier in suppliers]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
+@app.route('/suppliers/<int:productId>/recommend', methods = ['GET'])
+def action_recommend_product(productId):
+    return "A list of the best supplier(rating > 3.5) that supplies the product"
+
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
