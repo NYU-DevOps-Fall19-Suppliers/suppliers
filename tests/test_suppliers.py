@@ -92,20 +92,21 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(len(suppliers), 1)
         self.assertNotEqual(supplier.id, None)
 
-    # def test_update_a_supplier(self):
-    #     """ Update a supplier """
-    #     supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
-    #     supplier.save()
-    #     self.assertEqual(supplier.supplierID, 1)
-    #     # Change it an save it
-    #     supplier.supplierName = "Costco"
-    #     supplier.save()
-    #     self.assertEqual(supplier.supplierID, 1)
-    #     # Fetch it back and make sure the id hasn't changed
-    #     # but the data did change
-    #     suppliers = Supplier.all()
-    #     self.assertEqual(len(suppliers), 1)
-    #     self.assertEqual(suppliers[0].supplierName, "Walmart")
+    def test_update_a_supplier(self):
+        """ Update a supplier """
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
+        supplier.save()
+        self.assertNotEqual(supplier.id, None)
+        old_id = supplier.id
+        # Change it an save it
+        supplier.supplierName = "Costco"
+        supplier.save()
+        self.assertEqual(supplier.id, old_id)
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        suppliers = Supplier.all()
+        self.assertEqual(len(suppliers), 1)
+        self.assertEqual(suppliers[0].supplierName, "Costco")
         # pass
 
     # def test_find_supplier(self):
