@@ -81,7 +81,7 @@ class Supplier(Document):
         return cls.objects()
 
     @classmethod
-    def delete(cla, supplier_id):
+    def delete(cls, supplier_id):
         """ Delete a supplier by it's ID """
         cls.logger.info('Processing deleting for id %s', supplier_id)
         try:
@@ -90,7 +90,7 @@ class Supplier(Document):
             return None
 
     @classmethod
-    def find_by_name(cla, supplier_name):
+    def find_by_name(cls, supplier_name):
         """ Find a supplier by its name """
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
@@ -106,7 +106,7 @@ class Supplier(Document):
         cls.logger.info('Getting supplier with id: %s'.format(supplier_id))
 
         try:
-            return cls.objects(id=supplier_id)
+            return cls.objects(id=supplier_id).first()
         except DoesNotExist:
             return None
 
