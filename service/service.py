@@ -13,6 +13,7 @@ ACTION
 import os
 import sys
 import logging
+import json
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
@@ -114,6 +115,8 @@ def create_suppliers():
     app.logger.info('Request to create a supplier')
     check_content_type('application/json')
     data = request.get_json()
+    data = json.loads(data)
+
     try:
         data['supplierName']
     except KeyError as error:
@@ -123,8 +126,9 @@ def create_suppliers():
                                   'bad or no data')
     supplier = Supplier(**data)
     supplier.save()
-    location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
-    return make_response(supplier.to_json(), status.HTTP_201_CREATED, {'location': location_url})
+
+    #location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 @app.route('/')
 def index():
