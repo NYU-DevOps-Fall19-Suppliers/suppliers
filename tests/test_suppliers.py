@@ -109,9 +109,14 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(suppliers[0].supplierName, "Costco")
         # pass
 
-    # def test_find_supplier(self):
-        """ Find a supplier by ID """
-        # pass
+    def test_delete_a_supplier(self):
+        """ Delete a Supplier """
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
+        supplier.save()
+        self.assertEqual(len(Supplier.all()), 1)
+        # delete the supplier and make sure it isn't in the database
+        supplier.delete(supplier.id)
+        self.assertEqual(len(Supplier.all()), 0)
     
     def test_all(self):
         """ Return a list of suppliers """
