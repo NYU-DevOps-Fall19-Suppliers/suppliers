@@ -22,7 +22,7 @@ class Supplier(Document):
     # Table Schema
     supplierName = StringField(required=True)
     address = StringField(required=False)
-    productIdList = ListField(IntField(), required=False)
+    productIdList = ListField(StringField(), required=False)
     averageRating = IntField(required=False)
 
     def __repr__(self):
@@ -37,7 +37,8 @@ class Supplier(Document):
 
     def serialize(self):
         """ Serializes a Supplier into a dictionary """
-        return {"supplierName": self.supplierName,
+        return {"id": str(self.id),
+                "supplierName": self.supplierName,
                 "address": self.address,
                 "averageRating" : self.averageRating, 
                 "productIdList": self.productIdList}
@@ -88,7 +89,7 @@ class Supplier(Document):
 
     @classmethod
     def find_by_name(cla, supplier_name):
-        """ Find a supplier by it's name """
+        """ Find a supplier by its name """
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
             return cls.objects.get(supplierName=supplier_name)
