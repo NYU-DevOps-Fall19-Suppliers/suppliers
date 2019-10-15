@@ -72,6 +72,7 @@ class TestSupplierServer(unittest.TestCase):
     def test_create_supplier(self):
         # """ Create a new supplier """
         test_supplier = SupplierFactory()
+        self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
                              content_type='application/json')

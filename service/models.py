@@ -20,9 +20,9 @@ class Supplier(Document):
     app = None
 
     # Table Schema
-    supplierName = StringField(required=False)
+    supplierName = StringField(required=True)
     address = StringField(required=False)
-    productIdList = ListField(IntField(), required=False)
+    productIdList = ListField(StringField(), required=False)
     averageRating = IntField(required=False)
 
     def __repr__(self):
@@ -35,13 +35,16 @@ class Supplier(Document):
     #     Supplier.logger.info('Saving %s', self.supplierName)
     #     self.save()
 
+    # Deprecated function. Use supplier.to_json() instead
     def serialize(self):
         """ Serializes a Supplier into a dictionary """
-        return {"supplierName": self.supplierName,
+        return {"id": str(self.id),
+                "supplierName": self.supplierName,
                 "address": self.address,
                 "averageRating" : self.averageRating, 
                 "productIdList": self.productIdList}
 
+    # Deprecated function. Use supplier = Supplier(**data) instead
     def deserialize(self, data):
         """
         Deserializes a Supplier from a dictionary
@@ -87,6 +90,7 @@ class Supplier(Document):
             return None
 
     @classmethod
+
     def find_by_name(cls, supplier_name):
         """ Find a supplier by it's name """
         cls.logger.info('Processing looking for name %s', supplier_name)

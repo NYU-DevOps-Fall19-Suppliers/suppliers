@@ -23,9 +23,8 @@ from . import app
 
 # server = Flask(__name__)
 # server.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
-# mongo = PyMongo(server)
 
-# PyMongo connects to the MongoDB server running on port 27017 on localhost,
+# MongoEngine connects to the MongoDB server running on port 27017 on localhost,
 # to the database named myDatabase.
 # This database is exposed as the db attribute. (mongo.db)
 ######################################################################
@@ -102,17 +101,18 @@ def create_suppliers():
     """
     app.logger.info('Request to create a supplier')
     check_content_type('application/json')
-    supplier = Supplier()
     data = request.get_json()
-    supplier.from_json(data)
-    # supplier.deserialize(data)
+    try:
+        data['supplierName']
+    except KeyError as error:
+        raise DataValidationError('Invalid supplier: missing ' + error.args[0])
+    except TypeError as error:
+        raise DataValidationError('Invalid supplier: body of request contained' \
+                                  'bad or no data')
+    supplier = Supplier(**data)
     supplier.save()
-    # message = supplier.serialize()
     location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
-    return make_response(supplier.to_json(), status.HTTP_201_CREATED,
-                        {
-                            'Location': location_url
-                        })
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED, {'location': location_url})
 
 @app.route('/')
 def index():
@@ -124,8 +124,7 @@ def index():
 def list_suppliers():
     app.logger.info('Request for supplier list')
     suppliers = Supplier.all()
-    results = [supplier.serialize() for supplier in suppliers]
-    return make_response(jsonify(results), status.HTTP_200_OK)
+    return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 @app.route('/suppliers/<int:productId>/recommend', methods = ['GET'])
 def action_recommend_product(productId):
@@ -148,11 +147,10 @@ def init_db():
     Supplier.init_db(app)
 
 def check_content_type(content_type):
-    """ Checks that the media type is correct """
-    if request.headers['Content-Type'] == content_type:
-        return
-    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
-    abort(415, 'Content-Type must be {}'.format(content_type))
+    """ Checks whether the request content type is correct """
+    if request.headers['Content-Type'] != content_type:
+        app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+        abort(415, 'Content-Type must be {}'.format(content_type))
 
 # if __name__ == '__main__':
 #     app.run()

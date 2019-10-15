@@ -47,7 +47,7 @@ class TestSuppliers(unittest.TestCase):
 
     def test_serialize_a_supplier(self):
         """ Test serialization of a Supplier """
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
         data = supplier.serialize()
         self.assertNotEqual(data, None)
         self.assertIn('supplierName', data)
@@ -59,7 +59,7 @@ class TestSuppliers(unittest.TestCase):
 
     def test_deserialize_a_supplier(self):
         """ Test deserialization of a Supplier """
-        data = {"supplierName": "Walmart", "address":"NYC", "averageRating":5, "productIdList": [1,2,3]}
+        data = {"supplierName": "Walmart", "address":"NYC", "averageRating":5, "productIdList": ['1','2','3']}
         supplier = Supplier()
         supplier.deserialize(data)
         self.assertNotEqual(supplier, None)
@@ -67,22 +67,22 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.supplierName, "Walmart")
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)
-        self.assertEqual(supplier.productIdList, [1,2,3])
+        self.assertEqual(supplier.productIdList, ['1','2','3'])
 
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
         self.assertTrue(supplier != None)
         self.assertEqual(supplier.supplierName, "Walmart")
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)
-        self.assertEqual(supplier.productIdList, [1,2,3])
+        self.assertEqual(supplier.productIdList, ['1','2','3'])
 
     def test_add_a_supplier(self):
         """ Create a supplier and add it to the database """
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 0)
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3])
+        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
         self.assertTrue(supplier != None)
         self.assertEqual(supplier.id, None)
         supplier.save()
@@ -113,10 +113,10 @@ class TestSuppliers(unittest.TestCase):
         # pass
     
     def test_all(self):
-        Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = [1,2,3]).save()
-        Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = [1,3,4]).save()
+        """ Return a list of suppliers """
+        Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
+        Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 2)
         self.assertEqual(suppliers[0].supplierName, 'Walmart')
-        self.assertEqual(suppliers[1].supplierName, 'Costco')
-        """ Return a list of suppliers """
+        self.assertEqual(suppliers[1].supplierName, 'Costco')      
