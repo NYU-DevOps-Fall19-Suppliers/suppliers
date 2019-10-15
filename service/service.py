@@ -135,7 +135,7 @@ def action_recommend_product(productId):
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
 @app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
-def update_suppliers(supplier_id):
+def update_a_supplier(supplier_id):
     app.logger.info('Request to update a supplier')
     check_content_type('application/json')
     data = request.get_json()

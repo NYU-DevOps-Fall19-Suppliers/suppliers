@@ -106,7 +106,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
-        new_supplier = resp.get_json()
+        new_supplier = json.loads(resp.data)
         new_supplier['address'] = 'unknown'
         resp = self.app.put('/suppliers/{}'.format(new_supplier['id']),
                             json=new_supplier,
