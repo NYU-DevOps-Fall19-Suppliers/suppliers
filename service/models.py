@@ -35,6 +35,7 @@ class Supplier(Document):
     #     Supplier.logger.info('Saving %s', self.supplierName)
     #     self.save()
 
+    # Deprecated function. Use supplier.to_json() instead
     def serialize(self):
         """ Serializes a Supplier into a dictionary """
         return {"id": str(self.id),
@@ -43,6 +44,7 @@ class Supplier(Document):
                 "averageRating" : self.averageRating, 
                 "productIdList": self.productIdList}
 
+    # Deprecated function. Use supplier = Supplier(**data) instead
     def deserialize(self, data):
         """
         Deserializes a Supplier from a dictionary
