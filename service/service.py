@@ -146,6 +146,15 @@ def list_suppliers():
 def action_recommend_product(productId):
     return "A list of the best supplier(rating > 3.5) that supplies the product"
 
+@app.route('/suppliers', methods = ['GET'])
+def query_a_supplier():
+    """ Query a supplier """
+    app.logger.info('Query a supplier')
+    name = request.args.get('name')
+    supplier = Supplier.find_by_name(name)
+    return make_response(supplier.to_json(), status.HTTP_200_OK)
+
+
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
