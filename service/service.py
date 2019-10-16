@@ -126,6 +126,8 @@ def create_suppliers():
     app.logger.info('Request to create a supplier')
     check_content_type('application/json')
     data = request.get_json()
+    if not isinstance(data,dict):
+        data = json.loads(data)
 
     try:
         data['supplierName']
