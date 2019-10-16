@@ -10,11 +10,8 @@ QUERY
 ACTION
 """
 
-import os
-import sys
-import logging
 import json
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 
@@ -36,6 +33,7 @@ def request_validation_error(error):
     """ Handles Value Errors from bad data """
     return bad_request(error)
 
+
 @app.errorhandler(status.HTTP_400_BAD_REQUEST)
 def bad_request(error):
     """ Handles bad reuests with 400_BAD_REQUEST """
@@ -44,6 +42,7 @@ def bad_request(error):
     return jsonify(status=status.HTTP_400_BAD_REQUEST,
                    error='Bad Request',
                    message=message), status.HTTP_400_BAD_REQUEST
+
 
 @app.errorhandler(status.HTTP_404_NOT_FOUND)
 def not_found(error):
@@ -54,6 +53,7 @@ def not_found(error):
                    error='Not Found',
                    message=message), status.HTTP_404_NOT_FOUND
 
+
 @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
 def method_not_supported(error):
     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
@@ -63,6 +63,7 @@ def method_not_supported(error):
                    error='Method not Allowed',
                    message=message), status.HTTP_405_METHOD_NOT_ALLOWED
 
+
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def mediatype_not_supported(error):
     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
@@ -71,6 +72,7 @@ def mediatype_not_supported(error):
     return jsonify(status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
                    error='Unsupported media type',
                    message=message), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(error):
@@ -86,35 +88,36 @@ def internal_server_error(error):
 # GET A SUPPLIER
 ######################################################################
 
-@app.route('/suppliers/<string:supplierID>', methods = ['GET'])
+@app.route('/suppliers/<string:supplierID>', methods=['GET'])
 def get_a_supplier(supplierID):
     """Gets a single supplier
     This endpoint will get a Supplier based on a given supplierID
     """
     supplier = Supplier.find(supplierID)
 
-    if supplier != None:
+    if supplier is not None:
         return make_response(supplier.to_json(), status.HTTP_200_OK)
-    else:
-        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
+    return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
 
 ######################################################################
 # DELETE A SUPPLIER
 ######################################################################
 
-@app.route('/suppliers/<string:supplierID>', methods = ['DELETE'])
+
+@app.route('/suppliers/<string:supplierID>', methods=['DELETE'])
 def delete_a_supplier(supplierID):
     """ Route to delete a supplier """
     supplier = Supplier.find(supplierID)
     if supplier:
         supplier.delete()
     return make_response('DELETED', status.HTTP_204_NO_CONTENT)
-  
+
 ######################################################################
 # ADD A NEW SUPPLIER
 ######################################################################
 
-@app.route('/suppliers', methods = ['POST'])
+
+@app.route('/suppliers', methods=['POST'])
 def create_suppliers():
     """
     Creates a Supplier
@@ -130,7 +133,7 @@ def create_suppliers():
     except KeyError as error:
         raise DataValidationError('Invalid supplier: missing ' + error.args[0])
     except TypeError as error:
-        raise DataValidationError('Invalid supplier: body of request contained' \
+        raise DataValidationError('Invalid supplier: body of request contained'
                                   'bad or no data')
     supplier = Supplier(**data)
     supplier.save()
@@ -138,30 +141,39 @@ def create_suppliers():
     #location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
     return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
+
 @app.route('/')
 def index():
-    return make_response(jsonify(name = 'Supplier Demo REST API Service',
-    version = '1.0', paths = url_for('list_suppliers', _external=True)),
-    status.HTTP_200_OK)
+    """index"""
+    return make_response(
+        jsonify(
+            name='Supplier Demo REST API Service',
+            version='1.0',
+            paths=url_for(
+                'list_suppliers',
+                _external=True)),
+        status.HTTP_200_OK)
 
-@app.route('/suppliers', methods = ['GET'])
+
+@app.route('/suppliers', methods=['GET'])
 def list_suppliers():
     """ Route to list all suppliers """
     app.logger.info('Request for supplier list')
     suppliers = Supplier.all()
     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
-@app.route('/suppliers/<string:productId>/recommend', methods = ['GET'])
+
+@app.route('/suppliers/<string:productId>/recommend', methods=['GET'])
 def action_recommend_product(productId):
     """ Route to recommend a list of suppliers given a product"""
     app.logger.info('Recommend product')
     suppliers = Supplier.action_make_recommendation(productId)
-    if suppliers != None:
+    if suppliers is not None:
         return make_response(suppliers.to_json(), status.HTTP_200_OK)
-    else:
-        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
+    return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
 
-@app.route('/suppliers', methods = ['GET'])
+
+@app.route('/suppliers', methods=['GET'])
 def query_a_supplier():
     """ Query a supplier """
     app.logger.info('Query a supplier')
@@ -175,12 +187,14 @@ def query_a_supplier():
 ######################################################################
 @app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
 def update_a_supplier(supplier_id):
+    """ Update a supplier. """
     app.logger.info('Request to update a supplier')
     check_content_type('application/json')
     data = request.get_json()
     supplier = Supplier.find(supplier_id)
     if not supplier:
-        raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
+        raise NotFound(
+            "Supplier with id '{}' was not found.".format(supplier_id))
     supplier.update(**data)
     supplier.reload()
     return make_response(supplier.to_json(), status.HTTP_200_OK)
@@ -189,15 +203,19 @@ def update_a_supplier(supplier_id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
+
 def init_db():
     """ Initialies the mongoengine """
     global app
     Supplier.init_db(app)
 
+
 def check_content_type(content_type):
     """ Checks whether the request content type is correct """
     if request.headers['Content-Type'] != content_type:
-        app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+        app.logger.error(
+            'Invalid Content-Type: %s',
+            request.headers['Content-Type'])
         abort(415, 'Content-Type must be {}'.format(content_type))
 
 # if __name__ == '__main__':

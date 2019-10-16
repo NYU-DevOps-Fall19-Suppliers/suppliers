@@ -4,8 +4,9 @@ A model file that defines the data schema and database operations
 
 import logging
 from mongoengine import Document, StringField, ListField, IntField, connect
-from mongoengine.errors import ValidationError
+from mongoengine.errors import DoesNotExist, ValidationError
 from mongoengine.queryset.visitor import Q
+
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
@@ -15,6 +16,7 @@ class DataValidationError(Exception):
 #     Class that represents a product id
 #     """
 #     product_id = db.IntField(required=True)
+
 
 class Supplier(Document):
     """
@@ -66,7 +68,6 @@ class Supplier(Document):
             return None
         return res
 
-
     @classmethod
     def find(cls, supplier_id):
         """Retrieves a single supplier with a given id (supplierID) """
@@ -82,20 +83,24 @@ class Supplier(Document):
     @classmethod
     def find_by_product(cls, product_id):
         """Retrieves a list of supplier with a given product id """
-        cls.logger.info("Getting suppliers with product id: %s".format(product_id))
+        cls.logger.info(
+            "Getting suppliers with product id: %s".format(product_id))
         res = cls.objects(productIdList__in=product_id)
         return res
 
     @classmethod
     def find_by_rating(cls, rating):
         """Retrieves a list of supplier with a given rating score """
-        cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
+        cls.logger.info(
+            "Getting suppliers with ratting score greater than: %d".format(rating))
         res = cls.objects(averageRating__gte=rating)
         return res
 
     @classmethod
     def action_make_recommendation(cls, product_id):
         """Retrieves a list of supplier with a given rating score and product id """
-        cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
-        res = cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
+        cls.logger.info(
+            "Getting suppliers with ratting score greater than: %s".format(product_id))
+        res = cls.objects(Q(productIdList__in=product_id)
+                          & Q(averageRating__gte=3))
         return res
