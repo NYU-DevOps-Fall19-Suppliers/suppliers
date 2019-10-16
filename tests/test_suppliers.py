@@ -103,6 +103,17 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(suppliers[0].supplierName, 'Walmart')
         self.assertEqual(suppliers[1].supplierName, 'Costco')
 
+    def test_find_supplier_exception(self):
+        """test exception raised by find. """
+        non_exist = Supplier.find("random_id")
+        self.assertEqual(non_exist, None)
+
+    def test_delete_supplier_exception(self):
+        """test exception raised by delete. """
+        non_exist = Supplier.delete("random_id")
+        self.assertEqual(non_exist, None)
+
+
     def test_query_by_name(self):
         """ Return a supplier given a name """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
