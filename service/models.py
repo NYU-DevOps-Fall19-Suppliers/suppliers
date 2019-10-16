@@ -96,8 +96,9 @@ class Supplier(Document):
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
             res = cls.objects.get(supplierName=supplier_name)
-        except ValidationError:
-            return None
+        except ValidationError as e:
+            raise DataValidationError('Invalid supplier_name: failed to ' \
+                                      'find a supplier with given supplier_name')
         return res
 
 
