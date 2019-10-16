@@ -165,9 +165,34 @@ class TestSupplierServer(unittest.TestCase):
         """ Delete a supplier """
         pass
 
-    def test_query_supplier_list_by_rating(self):
-        """ Query supplier by rating """
-        pass
+    def test_query_supplier_list_by_name(self):
+        """ Query supplier by name """
+        # create a supplier to update
+        test_supplier = SupplierFactory()
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the supplier
+        new_supplier = json.loads(resp.data)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        new_supplier.pop('_id', None)
+        new_supplier['supplierName'] = 'Wholefoods'
+        new_supplier['address'] = 'unknown'
+        resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
+                            json=new_supplier,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        
+        resp = self.app.get("/suppliers?name=Wholefoods")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        queried_suppliers = json.loads(resp.data)
+        queried_supplier = queried_suppliers[0]
+        self.assertEqual(queried_supplier['supplierName'], 'Wholefoods')
+        self.assertEqual(queried_supplier['address'], 'unknown')
+
 
     # @patch('service.models.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):

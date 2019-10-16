@@ -118,11 +118,42 @@ class TestSuppliers(unittest.TestCase):
         supplier.delete(supplier.id)
         self.assertEqual(len(Supplier.all()), 0)
     
-    def test_all(self):
+    def test_list_all_supplier(self):
         """ Return a list of suppliers """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 2)
         self.assertEqual(suppliers[0].supplierName, 'Walmart')
-        self.assertEqual(suppliers[1].supplierName, 'Costco')      
+        self.assertEqual(suppliers[1].supplierName, 'Costco')
+
+    def test_query_by_name(self):
+        """ Return a supplier given a name """
+        Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
+        Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
+        supplier = Supplier.find_by_name("Walmart")
+        self.assertEqual(supplier.address, "NYC")
+        self.assertEqual(supplier.averageRating, 5)
+        self.assertEqual(supplier.productIdList, ['1','2','3'])
+    
+    def test_query_by_product(self):
+        Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
+        Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
+        suppliers = Supplier.find_by_product("4")
+        supplier = suppliers[0]
+        self.assertEqual(supplier.supplierName, "Costco")
+        self.assertEqual(supplier.address, "SF")
+        self.assertEqual(supplier.averageRating, 2)
+        self.assertEqual(supplier.productIdList, ['1','3','4'])
+
+    def test_query_by_rating(self):
+        Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
+        Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
+        suppliers = Supplier.find_by_rating(5)
+        supplier = suppliers[0]
+        self.assertEqual(supplier.supplierName, "Walmart")
+        self.assertEqual(supplier.address, "NYC")
+        self.assertEqual(supplier.averageRating, 5)
+        self.assertEqual(supplier.productIdList, ['1','2','3'])
+
+
