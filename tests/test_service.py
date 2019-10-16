@@ -169,6 +169,36 @@ class TestSupplierServer(unittest.TestCase):
         """ Query supplier by rating """
         pass
 
+    def test_action_make_recommendation(self):
+        """ Recommend a list of suppliers given a specific product id"""
+        test_supplier = SupplierFactory()
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json(),
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        new_supplier = json.loads(resp.data)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        new_supplier.pop('_id', None)
+        new_supplier['productIdList'] = ['2','3','4','5','7']
+        new_supplier['averageRating'] = 5
+        new_supplier['supplierName'] = 'Wholefoods'
+        resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
+                            json=new_supplier,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        resp = self.app.get('/suppliers/7/recommend')
+        recommend_suppliers = json.loads(resp.data)
+        supplier = recommend_suppliers[0]
+        self.assertEqual(supplier['supplierName'],'Wholefoods')
+        self.assertEqual(supplier['averageRating'],5)
+        self.assertEqual(supplier['productIdList'],['2','3','4','5','7'])
+
+
+
+
+
     # @patch('service.models.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):
     #     """ Test a Bad Request error from Find By Name """
