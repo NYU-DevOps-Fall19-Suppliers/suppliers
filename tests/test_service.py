@@ -73,6 +73,11 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_create_supplier(self):
         """ Create a new supplier """
+
+        resp = self.app.post('/suppliers',
+)
+        self.assertRaises(DataValidationError)
+
         test_supplier = Supplier()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
@@ -85,6 +90,12 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
                              content_type='wrong')
+        self.assertRaises(DataValidationError)
+
+        test_supplier = Supplier()
+        self.assertNotEqual(test_supplier, None)
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json())
         self.assertRaises(DataValidationError)
 
         test_supplier = SupplierFactory()
@@ -242,20 +253,11 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(supplier['averageRating'],5)
         self.assertEqual(supplier['productIdList'],['2','3','4','5','7'])
 
-#     def test_not_found(self):
-#         """ Test Not Found Error Handle """
-#         test_supplier = SupplierFactory()
-#         resp = self.app.get('/suppliers/1234/recommend')
-#         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        resp = self.app.get('/suppliers/100/recommend')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-#     def test_method_not_allowed(self):
-#         """ Test Method Not Support Error Handle """
-#         test_supplier = SupplierFactory()
-#         resp = self.app.post('/suppliers/1234/recommend')
-#         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def test_internal_error(self):
-        """ Test Internal Error Handle """
+    def test_500_handler(self):
+        """ Test 500 handler """
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers')
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
