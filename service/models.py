@@ -1,7 +1,10 @@
+"""
+A model file that defines the data schema and database operations
+"""
+
 import logging
-from flask import Flask
-from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
-from mongoengine.errors import DoesNotExist, InvalidQueryError, ValidationError
+from mongoengine import Document, StringField, ListField, IntField, connect
+from mongoengine.errors import DoesNotExist, ValidationError
 from mongoengine.queryset.visitor import Q
 
 
@@ -13,6 +16,7 @@ class DataValidationError(Exception):
 #     Class that represents a product id
 #     """
 #     product_id = db.IntField(required=True)
+
 
 class Supplier(Document):
     """
@@ -38,33 +42,6 @@ class Supplier(Document):
     #     self.save()
 
     # Deprecated function. Use supplier.to_json() instead
-    def serialize(self):
-        """ Serializes a Supplier into a dictionary """
-        return {"id": str(self.id),
-                "supplierName": self.supplierName,
-                "address": self.address,
-                "averageRating" : self.averageRating, 
-                "productIdList": self.productIdList}
-
-    # Deprecated function. Use supplier = Supplier(**data) instead
-    def deserialize(self, data):
-        """
-        Deserializes a Supplier from a dictionary
-        Args:
-            data (dict): A dictionary containing the Supplier data
-        """
-        try:
-            self.supplierName = data['supplierName']
-            self.address = data['address']
-            self.averageRating = data['averageRating']
-            # product = Product()
-            self.productIdList = data['productIdList']
-        except KeyError as error:
-            raise DataValidationError('Invalid supplier: missing ' + error.args[0])
-        except TypeError as error:
-            raise DataValidationError('Invalid supplier: body of request contained' \
-                                      'bad or no data')
-        return self
 
     @classmethod
     def init_db(cls, app):
@@ -72,41 +49,30 @@ class Supplier(Document):
         cls.logger.info('Initializing database')
         cls.app = app
         # This is where we initialize mongoDB from the Flask app
-        db = connect('myDatabase')
+        connect('myDatabase')
         app.app_context().push()
 
     @classmethod
     def all(cls):
-        #This is a function to return all suppliers
+        """This is a function to return all suppliers"""
         cls.logger.info('Processing all suppliers')
         return cls.objects()
 
     @classmethod
-    def delete(cla, supplier_id):
-        """ Delete a supplier by it's ID """
-        cls.logger.info('Processing deleting for id %s', supplier_id)
-        try:
-            res = cls.objects(id=supplier_id).first()
-        except ValidationError:
-            return None
-        res.delete()
-
-    @classmethod
-    def find_by_name(cla, supplier_name):
+    def find_by_name(cls, supplier_name):
         """ Find a supplier by its name """
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
             res = cls.objects.get(supplierName=supplier_name)
-        except ValidationError:
+        except DoesNotExist:
             return None
         return res
-
 
     @classmethod
     def find(cls, supplier_id):
         """Retrieves a single supplier with a given id (supplierID) """
 
-        cls.logger.info('Getting supplier with id: %s'.format(supplier_id))
+        cls.logger.info('Getting supplier with id: %s', supplier_id)
 
         try:
             res = cls.objects(id=supplier_id).first()
@@ -117,41 +83,24 @@ class Supplier(Document):
     @classmethod
     def find_by_product(cls, product_id):
         """Retrieves a list of supplier with a given product id """
-        cls.logger.info("Getting suppliers with product id: %s".format(product_id))
-        try:
-            res = cls.objects(productIdList__in=product_id)
-        except ValidationError:
-            return None
+        cls.logger.info(
+            "Getting suppliers with product id: %s".format(product_id))
+        res = cls.objects(productIdList__in=product_id)
         return res
 
     @classmethod
     def find_by_rating(cls, rating):
         """Retrieves a list of supplier with a given rating score """
-        cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
-        try:
-            res = cls.objects(averageRating__gte=3)
-        except ValidationError:
-            return None
+        cls.logger.info(
+            "Getting suppliers with ratting score greater than: %d".format(rating))
+        res = cls.objects(averageRating__gte=rating)
         return res
 
     @classmethod
     def action_make_recommendation(cls, product_id):
         """Retrieves a list of supplier with a given rating score and product id """
-        cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
-        try:
-            res = cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
-        except ValidationError:
-            return None
+        cls.logger.info(
+            "Getting suppliers with ratting score greater than: %s".format(product_id))
+        res = cls.objects(Q(productIdList__in=product_id)
+                          & Q(averageRating__gte=3))
         return res
-
-
-
-"""
-Test case for evaluating if the database is properly connected
-Should be removed as the further development goes
-"""
-# sup1 = Supplier(supplierID=123, supplierName = 'Walmart', address='NYC', averageRating=5)
-# sup1.save()
-
-# res = Supplier.objects(supplierName='sup1').first()
-# print(res.address)
