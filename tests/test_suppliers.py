@@ -37,13 +37,13 @@ class TestSuppliers(unittest.TestCase):
     def setUp(self):      
         disconnect('default')
         global db
-        db = connect('mydatabase')
+        db = connect('testdb')
         # self.app = app.test_client()
-        db.drop_database('mydatabase')
+        db.drop_database('testdb')
 
     def tearDown(self):
-        db.drop_database('mydatabase')
-        disconnect('mydatabase')
+        db.drop_database('testdb')
+        disconnect('testdb')
 
     def test_serialize_a_supplier(self):
         """ Test serialization of a Supplier """

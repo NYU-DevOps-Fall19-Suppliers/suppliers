@@ -42,12 +42,12 @@ class TestSupplierServer(unittest.TestCase):
     def setUp(self):
         """ Runs before each test """
         disconnect('default')
-        db = connect('mydatabase')
-        db.drop_database('mydatabase')
+        db = connect('testdb')
+        db.drop_database('testdb')
         self.app = app.test_client()
 
     def tearDown(self):
-        disconnect('mydatabase')
+        disconnect('testdb')
 
     def _create_suppliers(self, count):
         """ Factory method to create suppliers in bulk """
@@ -60,7 +60,8 @@ class TestSupplierServer(unittest.TestCase):
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
 
             new_supplier = json.loads(resp.data)
-            test_supplier.id = new_supplier["_id"]["$oid"]            
+            test_supplier.id = new_supplier["_id"]["$oid"]
+            
             suppliers.append(test_supplier)
         return suppliers
 
@@ -109,8 +110,10 @@ class TestSupplierServer(unittest.TestCase):
 
         # update the supplier
         new_supplier = json.loads(resp.data)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        new_supplier.pop('_id', None)
         new_supplier['address'] = 'unknown'
-        resp = self.app.put('/suppliers/{}'.format(new_supplier["_id"]["$oid"]),
+        resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -126,6 +129,18 @@ class TestSupplierServer(unittest.TestCase):
         data = json.loads(resp.data)
         self.assertEqual(len(data), 2)
         pass
+
+    def test_delete_supplier(self):
+        """ Delete a Supplier """
+        test_supplier = self._create_suppliers(1)[0]
+        resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get('/suppliers/{}'.format(test_supplier.id),
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_supplier(self):
         """ Get a single supplier """
