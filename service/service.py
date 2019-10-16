@@ -86,9 +86,11 @@ def internal_server_error(error):
 # GET A SUPPLIER
 ######################################################################
 
-@app.route('/suppliers/<int:supplierID>', methods = ['GET'])
-def read(supplierID):
-
+@app.route('/suppliers/<string:supplierID>', methods = ['GET'])
+def get_a_supplier(supplierID):
+    """Gets a single supplier
+    This endpoint will get a Supplier based on a given supplierID
+    """
     supplier = Supplier.find(supplierID)
 
     if supplier != None:
