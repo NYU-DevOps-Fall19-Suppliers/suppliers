@@ -94,36 +94,8 @@ class Supplier(Document):
     def action_make_recommendation(cls, product_id):
         """Retrieves a list of supplier with a given rating score and product id """
         cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
-        try:
-            res = cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
-        except ValidationError:
-            return None
+        res = cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
         return res
-
-
-    @classmethod
-    def find_by_product(cls, product_id):
-        """Retrieves a list of supplier with a given product id """
-        cls.logger.info("Getting suppliers with product id: %s".format(product_id))
-        try:
-            return cls.objects(productIdList__in=product_id)
-        except ValidationError:
-            return None
-
-    @classmethod
-    def find_by_rating(cls, rating):
-        """Retrieves a list of supplier with a given rating score """
-        cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
-        try:
-            return cls.objects(averageRating__gte=rating)
-        except ValidationError:
-            return None
-
-    @classmethod
-    def action_make_recommendation(cls, product_id):
-        """Retrieves a list of supplier with a given rating score and product id """
-        cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
-        return cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
 
 
 
