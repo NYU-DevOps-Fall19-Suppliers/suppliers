@@ -180,7 +180,7 @@ class TestSupplierServer(unittest.TestCase):
                             json=new_supplier,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        
+
         resp = self.app.get("/suppliers?name=Wholefoods")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
@@ -216,8 +216,16 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(supplier['averageRating'],5)
         self.assertEqual(supplier['productIdList'],['2','3','4','5','7'])
 
+    def test_404_handler(self):
+        """ Test 404 handler """
+        resp = self.app.get('/suppliers/')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_405_handler(self):
+        """ Test 405 handler """
+        resp = self.app.delete('/suppliers')
 
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
     # @patch('service.models.Pet.find_by_name')
