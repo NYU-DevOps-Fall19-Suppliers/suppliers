@@ -87,9 +87,16 @@ def internal_server_error(error):
 ######################################################################
 
 @app.route('/suppliers/<string:supplierID>', methods = ['GET'])
-def read(supplierID):
+def get_a_supplier(supplierID):
+    """Gets a single supplier
+    This endpoint will get a Supplier based on a given supplierID
+    """
     supplier = Supplier.find(supplierID)
-    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
+
+    if supplier != None:
+        return make_response(supplier.to_json(), status.HTTP_200_OK)
+    else:
+        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
 
 ######################################################################
 # DELETE A SUPPLIER
@@ -102,6 +109,7 @@ def delete_a_supplier(supplierID):
     if supplier:
         supplier.delete()
     return make_response('DELETED', status.HTTP_204_NO_CONTENT)
+  
 ######################################################################
 # ADD A NEW SUPPLIER
 ######################################################################

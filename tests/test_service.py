@@ -61,7 +61,6 @@ class TestSupplierServer(unittest.TestCase):
 
             new_supplier = json.loads(resp.data)
             test_supplier.id = new_supplier["_id"]["$oid"]
-            
             suppliers.append(test_supplier)
         return suppliers
 
@@ -144,10 +143,21 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_get_supplier(self):
         """ Get a single supplier """
+
+        supplier = self._create_suppliers(1)
+        supplier = supplier[0]
+        valid_id = supplier.id
+
+        resp = self.app.get('/suppliers/' + valid_id)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         pass
 
     def test_get_supplier_not_found(self):
         """ Get a supplier thats not found """
+        resp = self.app.get('/suppliers/4f4381f4e779897a2c000009')
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         pass
 
 
