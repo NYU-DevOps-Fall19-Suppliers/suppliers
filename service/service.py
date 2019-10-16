@@ -215,8 +215,7 @@ def check_content_type(content_type):
     try:
         request.headers['Content-Type']
     except KeyError as error:
-        app.logger.error(
-            'Null Content-Type: %s')
+        app.logger.error('Null Content-Type')
         abort(415, 'Content-Type is missing')
     if request.headers['Content-Type'] != content_type:
         app.logger.error(
