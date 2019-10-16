@@ -37,33 +37,6 @@ class Supplier(Document):
     #     self.save()
 
     # Deprecated function. Use supplier.to_json() instead
-    def serialize(self):
-        """ Serializes a Supplier into a dictionary """
-        return {"id": str(self.id),
-                "supplierName": self.supplierName,
-                "address": self.address,
-                "averageRating" : self.averageRating,
-                "productIdList": self.productIdList}
-
-    # Deprecated function. Use supplier = Supplier(**data) instead
-    def deserialize(self, data):
-        """
-        Deserializes a Supplier from a dictionary
-        Args:
-            data (dict): A dictionary containing the Supplier data
-        """
-        try:
-            self.supplierName = data['supplierName']
-            self.address = data['address']
-            self.averageRating = data['averageRating']
-            # product = Product()
-            self.productIdList = data['productIdList']
-        except KeyError as error:
-            raise DataValidationError('Invalid supplier: missing ' + error.args[0])
-        except TypeError as error:
-            raise DataValidationError('Invalid supplier: body of request contained' \
-                                      'bad or no data')
-        return self
 
     @classmethod
     def init_db(cls, app):
@@ -96,9 +69,8 @@ class Supplier(Document):
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
             res = cls.objects.get(supplierName=supplier_name)
-        except ValidationError as e:
-            raise DataValidationError('Invalid supplier_name: failed to ' \
-                                      'find a supplier with given supplier_name')
+        except ValidationError:
+            return None
         return res
 
 

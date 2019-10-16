@@ -45,30 +45,6 @@ class TestSuppliers(unittest.TestCase):
         db.drop_database('testdb')
         disconnect('testdb')
 
-    def test_serialize_a_supplier(self):
-        """ Test serialization of a Supplier """
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
-        data = supplier.serialize()
-        self.assertNotEqual(data, None)
-        self.assertIn('supplierName', data)
-        self.assertEqual(data['supplierName'], "Walmart")
-        self.assertIn('address', data)
-        self.assertEqual(data['address'], "NYC")
-        self.assertIn('averageRating', data)
-        self.assertEqual(data['averageRating'], 5)
-
-    def test_deserialize_a_supplier(self):
-        """ Test deserialization of a Supplier """
-        data = {"supplierName": "Walmart", "address":"NYC", "averageRating":5, "productIdList": ['1','2','3']}
-        supplier = Supplier()
-        supplier.deserialize(data)
-        self.assertNotEqual(supplier, None)
-        self.assertEqual(supplier.id, None)
-        self.assertEqual(supplier.supplierName, "Walmart")
-        self.assertEqual(supplier.address, "NYC")
-        self.assertEqual(supplier.averageRating, 5)
-        self.assertEqual(supplier.productIdList, ['1','2','3'])
-
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
