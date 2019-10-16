@@ -72,7 +72,14 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(data['name'], 'Supplier Demo REST API Service')
 
     def test_create_supplier(self):
-        # """ Create a new supplier """
+        """ Create a new supplier """
+        test_supplier = Supplier()
+        self.assertNotEqual(test_supplier, None)
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json(),
+                             content_type='application/json')
+        self.assertRaises(DataValidationError)
+
         test_supplier = SupplierFactory()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
@@ -120,6 +127,15 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(updated_supplier['address'], 'unknown')
 
 
+        new_supplier_id = 0
+        resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
+                        json=new_supplier,
+                        content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+
+
     def test_get_supplier_list(self):
         """ Get a list of suppliers """
         self._create_suppliers(2)
@@ -127,7 +143,6 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
         self.assertEqual(len(data), 2)
-        pass
 
     def test_delete_supplier(self):
         """ Delete a Supplier """
@@ -161,8 +176,8 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         pass
 
-    def test_query_supplier_list_by_name(self):
-        """ Query supplier by name """
+    def test_query_supplier_list_by_rating(self):
+        """ Query suppliers by rating """
         # create a supplier to update
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
@@ -176,18 +191,22 @@ class TestSupplierServer(unittest.TestCase):
         new_supplier.pop('_id', None)
         new_supplier['supplierName'] = 'Wholefoods'
         new_supplier['address'] = 'unknown'
+        new_supplier['averageRating'] = 6
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         
-        resp = self.app.get("/suppliers?name=Wholefoods")
+        resp = self.app.get("/suppliers?rating=6")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         queried_suppliers = json.loads(resp.data)
         queried_supplier = queried_suppliers[0]
         self.assertEqual(queried_supplier['supplierName'], 'Wholefoods')
         self.assertEqual(queried_supplier['address'], 'unknown')
+
+        resp = self.app.get('/suppliers?rating=7')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
 
     def test_action_make_recommendation(self):
@@ -216,14 +235,20 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(supplier['averageRating'],5)
         self.assertEqual(supplier['productIdList'],['2','3','4','5','7'])
 
+    def test_not_found(self):
+        """ Test Not Found Error Handle """
+        test_supplier = SupplierFactory()
+        resp = self.app.get('/suppliers/1234/recommend')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_method_not_allowed(self):
+        """ Test Method Not Support Error Handle """
+        test_supplier = SupplierFactory()
+        resp = self.app.post('/suppliers/1234/recommend')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
-
-    # @patch('service.models.Pet.find_by_name')
-    # def test_bad_request(self, bad_request_mock):
-    #     """ Test a Bad Request error from Find By Name """
-    #     bad_request_mock.side_effect = DataValidationError()
-    #     resp = self.app.get('/pets', query_string='name=fido')
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-    #
+    def test_internal_error(self):
+        """ Test Internal Error Handle """
+        test_supplier = SupplierFactory()
+        resp = self.app.post('/suppliers')
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)

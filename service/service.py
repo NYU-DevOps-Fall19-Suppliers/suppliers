@@ -97,7 +97,7 @@ def get_a_supplier(supplierID):
 
     if supplier is not None:
         return make_response(supplier.to_json(), status.HTTP_200_OK)
-    return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
+    return not_found("Not Found")
 
 ######################################################################
 # DELETE A SUPPLIER
@@ -159,7 +159,13 @@ def index():
 def list_suppliers():
     """ Route to list all suppliers """
     app.logger.info('Request for supplier list')
-    suppliers = Supplier.all()
+    rating = request.args.get('rating')
+    if rating:
+        suppliers = Supplier.find_by_rating(rating)
+        if(len(suppliers) == 0):
+            return bad_request("Bad Request")
+    else:
+        suppliers = Supplier.all()
     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 
@@ -168,19 +174,9 @@ def action_recommend_product(productId):
     """ Route to recommend a list of suppliers given a product"""
     app.logger.info('Recommend product')
     suppliers = Supplier.action_make_recommendation(productId)
-    if suppliers is not None:
+    if len(suppliers) > 0:
         return make_response(suppliers.to_json(), status.HTTP_200_OK)
-    return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
-
-
-@app.route('/suppliers', methods=['GET'])
-def query_a_supplier():
-    """ Query a supplier """
-    app.logger.info('Query a supplier')
-    name = request.args.get('name')
-    supplier = Supplier.find_by_name(name)
-    return make_response(supplier.to_json(), status.HTTP_200_OK)
-
+    return not_found("Not Found")
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
