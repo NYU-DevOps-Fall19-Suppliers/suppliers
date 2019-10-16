@@ -156,7 +156,10 @@ def action_recommend_product(productId):
     """ Route to recommend a list of suppliers given a product"""
     app.logger.info('Recommend product')
     suppliers = Supplier.action_make_recommendation(productId)
-    return make_response(suppliers.to_json(), status.HTTP_200_OK)
+    if suppliers != None:
+        return make_response(suppliers.to_json(), status.HTTP_200_OK)
+    else:
+        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
 
 @app.route('/suppliers', methods = ['GET'])
 def query_a_supplier():
