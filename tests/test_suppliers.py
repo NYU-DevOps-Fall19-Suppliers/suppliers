@@ -45,30 +45,6 @@ class TestSuppliers(unittest.TestCase):
         db.drop_database('testdb')
         disconnect('testdb')
 
-    def test_serialize_a_supplier(self):
-        """ Test serialization of a Supplier """
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
-        data = supplier.serialize()
-        self.assertNotEqual(data, None)
-        self.assertIn('supplierName', data)
-        self.assertEqual(data['supplierName'], "Walmart")
-        self.assertIn('address', data)
-        self.assertEqual(data['address'], "NYC")
-        self.assertIn('averageRating', data)
-        self.assertEqual(data['averageRating'], 5)
-
-    def test_deserialize_a_supplier(self):
-        """ Test deserialization of a Supplier """
-        data = {"supplierName": "Walmart", "address":"NYC", "averageRating":5, "productIdList": ['1','2','3']}
-        supplier = Supplier()
-        supplier.deserialize(data)
-        self.assertNotEqual(supplier, None)
-        self.assertEqual(supplier.id, None)
-        self.assertEqual(supplier.supplierName, "Walmart")
-        self.assertEqual(supplier.address, "NYC")
-        self.assertEqual(supplier.averageRating, 5)
-        self.assertEqual(supplier.productIdList, ['1','2','3'])
-
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
@@ -109,15 +85,6 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(suppliers[0].supplierName, "Costco")
         # pass
 
-    def test_delete_a_supplier(self):
-        """ Delete a Supplier """
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
-        supplier.save()
-        self.assertEqual(len(Supplier.all()), 1)
-        # delete the supplier and make sure it isn't in the database
-        supplier.delete(supplier.id)
-        self.assertEqual(len(Supplier.all()), 0)
-    
     def test_list_all_supplier(self):
         """ Return a list of suppliers """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
@@ -127,6 +94,11 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(suppliers[0].supplierName, 'Walmart')
         self.assertEqual(suppliers[1].supplierName, 'Costco')
 
+    def test_find_supplier_exception(self):
+        """test exception raised by find. """
+        non_exist = Supplier.find("random_id")
+        self.assertEqual(non_exist, None)
+
     def test_query_by_name(self):
         """ Return a supplier given a name """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
@@ -135,6 +107,8 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)
         self.assertEqual(supplier.productIdList, ['1','2','3'])
+        nowhere = Supplier.find_by_name("NoWhere")
+        self.assertEqual(nowhere, None)
     
     def test_query_by_product(self):
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
@@ -150,10 +124,10 @@ class TestSuppliers(unittest.TestCase):
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.find_by_rating(5)
+        self.assertEqual(len(suppliers), 1)
         supplier = suppliers[0]
         self.assertEqual(supplier.supplierName, "Walmart")
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)
         self.assertEqual(supplier.productIdList, ['1','2','3'])
-
 
