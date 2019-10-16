@@ -8,7 +8,7 @@ from service.models import Supplier
 class SupplierFactory(factory.Factory):
     """ Creates fake suppliers for tests. """
     class Meta:
-         model = Supplier
+        model = Supplier
     # supplierID = factory.Sequence(lambda n: n)
     supplierName = FuzzyChoice(choices=['Walmart', 'Costco', 'Ikea', 'Apple', 'Microsoft'])
     address = FuzzyChoice(choices=['NYC', 'LA', 'SF', 'Seattle'])
