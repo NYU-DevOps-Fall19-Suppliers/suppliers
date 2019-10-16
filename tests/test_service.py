@@ -42,12 +42,12 @@ class TestSupplierServer(unittest.TestCase):
     def setUp(self):
         """ Runs before each test """
         disconnect('default')
-        db = connect('mydatabase')
-        db.drop_database('mydatabase')
+        db = connect('testdb')
+        db.drop_database('testdb')
         self.app = app.test_client()
 
     def tearDown(self):
-        disconnect('mydatabase')
+        disconnect('testdb')
 
     def _create_suppliers(self, count):
         """ Factory method to create suppliers in bulk """
@@ -110,12 +110,14 @@ class TestSupplierServer(unittest.TestCase):
 
         # update the supplier
         new_supplier = json.loads(resp.data)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        new_supplier.pop('_id', None)
         new_supplier['address'] = 'unknown'
-        resp = self.app.put('/suppliers/{}'.format(new_supplier['id']),
+        resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        updated_supplier = resp.get_json()
+        updated_supplier = json.loads(resp.data)
         self.assertEqual(updated_supplier['address'], 'unknown')
 
 
