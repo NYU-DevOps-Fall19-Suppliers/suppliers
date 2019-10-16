@@ -14,10 +14,12 @@ This build is for Sprint 2, intended for the Wednesday, October 16 2019 due date
  POST /suppliers - creates a new supplier record in the database
  PUT /suppliers/<string:supplierID> - updates a supplier record in the database
  DELETE /suppliers/<string:supplierID> - deletes a supplier record in the database
- QUERY /suppliers/
- ACTION/ suppliers/<string:productId>/recommend
+ QUERY /suppliers/ - query the database by the name of the supplier
+ ACTION /suppliers/<string:productId>/recommend - query the database for suppliers that serve a certain product with a average rating of 3 or above
 
 <string:supplierID> is a string of 24 hexadecimal characters eg: 4f4381f4e779897a2c000009
+
+The recommend
 
 ### Running Tests
 To run the tests please run the following commands:
