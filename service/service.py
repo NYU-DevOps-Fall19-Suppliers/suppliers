@@ -54,23 +54,23 @@ def not_found(error):
                    error='Not Found',
                    message=message), status.HTTP_404_NOT_FOUND
 
-@app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
-def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    message = str(error)
-    app.logger.warning(message)
-    return jsonify(status=status.HTTP_405_METHOD_NOT_ALLOWED,
-                   error='Method not Allowed',
-                   message=message), status.HTTP_405_METHOD_NOT_ALLOWED
+# @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
+# def method_not_supported(error):
+#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+#     message = str(error)
+#     app.logger.warning(message)
+#     return jsonify(status=status.HTTP_405_METHOD_NOT_ALLOWED,
+#                    error='Method not Allowed',
+#                    message=message), status.HTTP_405_METHOD_NOT_ALLOWED
 
-@app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-    message = str(error)
-    app.logger.warning(message)
-    return jsonify(status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-                   error='Unsupported media type',
-                   message=message), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+# @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+# def mediatype_not_supported(error):
+#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+#     message = str(error)
+#     app.logger.warning(message)
+#     return jsonify(status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+#                    error='Unsupported media type',
+#                    message=message), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 @app.errorhandler(status.HTTP_500_INTERNAL_SERVER_ERROR)
 def internal_server_error(error):
@@ -148,7 +148,11 @@ def index():
 def list_suppliers():
     """ Route to list all suppliers """
     app.logger.info('Request for supplier list')
-    suppliers = Supplier.all()
+    rating = request.args.get('rating')
+    if rating:
+        suppliers = Supplier.find_by_rating(rating)
+    else:
+        suppliers = Supplier.all()
     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 @app.route('/suppliers/<string:productId>/recommend', methods = ['GET'])
@@ -160,18 +164,6 @@ def action_recommend_product(productId):
         return make_response(suppliers.to_json(), status.HTTP_200_OK)
     else:
         return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
-
-@app.route('/suppliers', methods = ['GET'])
-def query_a_supplier():
-    """ Query a supplier """
-    app.logger.info('Query a supplier')
-    name = request.args.get('name')
-    supplier = Supplier.find_by_name(name)
-    if supplier != None:
-        return make_response(supplier.to_json(), status.HTTP_200_OK)
-    else:
-        return bad_request("Bad Request")
-
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
