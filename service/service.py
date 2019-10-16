@@ -13,6 +13,7 @@ ACTION
 import os
 import sys
 import logging
+import json
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
@@ -23,9 +24,8 @@ from . import app
 
 # server = Flask(__name__)
 # server.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
-# mongo = PyMongo(server)
 
-# PyMongo connects to the MongoDB server running on port 27017 on localhost,
+# MongoEngine connects to the MongoDB server running on port 27017 on localhost,
 # to the database named myDatabase.
 # This database is exposed as the db attribute. (mongo.db)
 ######################################################################
@@ -99,6 +99,18 @@ def get_a_supplier(supplierID):
         return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
 
 ######################################################################
+# DELETE A SUPPLIER
+######################################################################
+
+@app.route('/suppliers/<string:supplierID>', methods = ['DELETE'])
+def delete_a_supplier(supplierID):
+    """ Route to delete a supplier """
+    supplier = Supplier.find(supplierID)
+    if supplier:
+        supplier.delete()
+    return make_response('DELETED', status.HTTP_204_NO_CONTENT)
+  
+######################################################################
 # ADD A NEW SUPPLIER
 ######################################################################
 
@@ -108,19 +120,23 @@ def create_suppliers():
     Creates a Supplier
     This endpoint will create a Supplier based the data in the body that is posted
     """
-    # app.logger.info('Request to create a supplier')
-    # check_content_type('application/json')
-    supplier = Supplier()
+    app.logger.info('Request to create a supplier')
+    check_content_type('application/json')
     data = request.get_json()
-    supplier.deserialize(data)
+    data = json.loads(data)
+
+    try:
+        data['supplierName']
+    except KeyError as error:
+        raise DataValidationError('Invalid supplier: missing ' + error.args[0])
+    except TypeError as error:
+        raise DataValidationError('Invalid supplier: body of request contained' \
+                                  'bad or no data')
+    supplier = Supplier(**data)
     supplier.save()
-    message = supplier.serialize()
-    # location_url = url_for('get_suppliers', supplier_id=supplier.supplierID, _external=True)
-    # return make_response(jsonify(message), status.HTTP_201_CREATED,
-    #                     {
-    #                         'Location': location_url
-    #                     })
-    return data
+
+    #location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 @app.route('/')
 def index():
@@ -130,22 +146,32 @@ def index():
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
+    """ Route to list all suppliers """
     app.logger.info('Request for supplier list')
     suppliers = Supplier.all()
-    results = [supplier.serialize() for supplier in suppliers]
-    return make_response(jsonify(results), status.HTTP_200_OK)
+    return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
-@app.route('/suppliers/<int:productId>/recommend', methods = ['GET'])
+@app.route('/suppliers/<string:productId>/recommend', methods = ['GET'])
 def action_recommend_product(productId):
-    return "A list of the best supplier(rating > 3.5) that supplies the product"
+    """ Route to recommend a list of suppliers given a product"""
+    app.logger.info('Recommend product')
+    suppliers = Supplier.action_make_recommendation(productId)
+    return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
-@app.route('/suppliers/<int:supplier_id>', methods=['PUT'])
-def update_suppliers(supplier_id):
-    return str(supplier_id)
-
+@app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
+def update_a_supplier(supplier_id):
+    app.logger.info('Request to update a supplier')
+    check_content_type('application/json')
+    data = request.get_json()
+    supplier = Supplier.find(supplier_id)
+    if not supplier:
+        raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
+    supplier.update(**data)
+    supplier.reload()
+    return make_response(supplier.to_json(), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -155,6 +181,12 @@ def init_db():
     """ Initialies the mongoengine """
     global app
     Supplier.init_db(app)
+
+def check_content_type(content_type):
+    """ Checks whether the request content type is correct """
+    if request.headers['Content-Type'] != content_type:
+        app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+        abort(415, 'Content-Type must be {}'.format(content_type))
 
 # if __name__ == '__main__':
 #     app.run()
