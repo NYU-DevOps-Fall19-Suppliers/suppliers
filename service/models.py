@@ -1,7 +1,10 @@
+"""
+A model file that defines the data schema and database operations
+"""
+
 import logging
-from flask import Flask
-from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
-from mongoengine.errors import DoesNotExist, InvalidQueryError, ValidationError
+from mongoengine import Document, StringField, ListField, IntField, connect
+from mongoengine.errors import ValidationError
 from mongoengine.queryset.visitor import Q
 
 class DataValidationError(Exception):
@@ -44,12 +47,12 @@ class Supplier(Document):
         cls.logger.info('Initializing database')
         cls.app = app
         # This is where we initialize mongoDB from the Flask app
-        db = connect('myDatabase')
+        connect('myDatabase')
         app.app_context().push()
 
     @classmethod
     def all(cls):
-        #This is a function to return all suppliers
+        """This is a function to return all suppliers"""
         cls.logger.info('Processing all suppliers')
         return cls.objects()
 
@@ -68,7 +71,7 @@ class Supplier(Document):
     def find(cls, supplier_id):
         """Retrieves a single supplier with a given id (supplierID) """
 
-        cls.logger.info('Getting supplier with id: {}'.format(supplier_id))
+        cls.logger.info('Getting supplier with id: %s', supplier_id)
 
         try:
             res = cls.objects(id=supplier_id).first()
@@ -96,16 +99,3 @@ class Supplier(Document):
         cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
         res = cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
         return res
-
-
-
-
-"""
-Test case for evaluating if the database is properly connected
-Should be removed as the further development goes
-"""
-# sup1 = Supplier(supplierID=123, supplierName = 'Walmart', address='NYC', averageRating=5)
-# sup1.save()
-
-# res = Supplier.objects(supplierName='sup1').first()
-# print(res.address)
