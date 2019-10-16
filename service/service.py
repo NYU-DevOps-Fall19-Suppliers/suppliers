@@ -127,7 +127,22 @@ def list_suppliers():
 
 @app.route('/suppliers/<int:productId>/recommend', methods = ['GET'])
 def action_recommend_product(productId):
-    return "A list of the best supplier(rating > 3.5) that supplies the product"
+    """ Route to recommend a list of suppliers given a product"""
+    app.logger.info('Recommend product')
+    suppliers = Supplier.action_make_recommendation(productId)
+    if suppliers != None:
+        return make_response(suppliers.to_json(), status.HTTP_200_OK)
+    else:
+        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
+
+@app.route('/suppliers', methods = ['GET'])
+def query_a_supplier():
+    """ Query a supplier """
+    app.logger.info('Query a supplier')
+    name = request.args.get('name')
+    supplier = Supplier.find_by_name(name)
+    return make_response(supplier.to_json(), status.HTTP_200_OK)
+
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
