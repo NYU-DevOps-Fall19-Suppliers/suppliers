@@ -13,6 +13,7 @@ ACTION
 import os
 import sys
 import logging
+import json
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
@@ -85,10 +86,30 @@ def internal_server_error(error):
 # GET A SUPPLIER
 ######################################################################
 
-@app.route('/suppliers/<int:supplierID>', methods = ['GET'])
-def read(supplierID):
-	return supplier.find(supplierID)
+@app.route('/suppliers/<string:supplierID>', methods = ['GET'])
+def get_a_supplier(supplierID):
+    """Gets a single supplier
+    This endpoint will get a Supplier based on a given supplierID
+    """
+    supplier = Supplier.find(supplierID)
 
+    if supplier != None:
+        return make_response(supplier.to_json(), status.HTTP_200_OK)
+    else:
+        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
+
+######################################################################
+# DELETE A SUPPLIER
+######################################################################
+
+@app.route('/suppliers/<string:supplierID>', methods = ['DELETE'])
+def delete_a_supplier(supplierID):
+    """ Route to delete a supplier """
+    supplier = Supplier.find(supplierID)
+    if supplier:
+        supplier.delete()
+    return make_response('DELETED', status.HTTP_204_NO_CONTENT)
+  
 ######################################################################
 # ADD A NEW SUPPLIER
 ######################################################################
@@ -102,6 +123,8 @@ def create_suppliers():
     app.logger.info('Request to create a supplier')
     check_content_type('application/json')
     data = request.get_json()
+    data = json.loads(data)
+
     try:
         data['supplierName']
     except KeyError as error:
@@ -111,6 +134,8 @@ def create_suppliers():
                                   'bad or no data')
     supplier = Supplier(**data)
     supplier.save()
+
+    #location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
     return make_response(supplier.to_json(), status.HTTP_201_CREATED)
 
 @app.route('/')
@@ -121,11 +146,12 @@ def index():
 
 @app.route('/suppliers', methods = ['GET'])
 def list_suppliers():
+    """ Route to list all suppliers """
     app.logger.info('Request for supplier list')
     suppliers = Supplier.all()
     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
-@app.route('/suppliers/<int:productId>/recommend', methods = ['GET'])
+@app.route('/suppliers/<string:productId>/recommend', methods = ['GET'])
 def action_recommend_product(productId):
     """ Route to recommend a list of suppliers given a product"""
     app.logger.info('Recommend product')
@@ -147,10 +173,17 @@ def query_a_supplier():
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
-@app.route('/suppliers/<int:supplier_id>', methods=['PUT'])
-def update_suppliers(supplier_id):
-    return str(supplier_id)
-
+@app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
+def update_a_supplier(supplier_id):
+    app.logger.info('Request to update a supplier')
+    check_content_type('application/json')
+    data = request.get_json()
+    supplier = Supplier.find(supplier_id)
+    if not supplier:
+        raise NotFound("Supplier with id '{}' was not found.".format(supplier_id))
+    supplier.update(**data)
+    supplier.reload()
+    return make_response(supplier.to_json(), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -166,7 +199,6 @@ def check_content_type(content_type):
     if request.headers['Content-Type'] != content_type:
         app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
         abort(415, 'Content-Type must be {}'.format(content_type))
-    
 
 # if __name__ == '__main__':
 #     app.run()
