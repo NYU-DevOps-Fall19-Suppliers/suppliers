@@ -2,7 +2,7 @@ import logging
 from flask import Flask
 from mongoengine import Document, StringField, ListField, IntField, DateTimeField, connect
 from mongoengine.errors import DoesNotExist, InvalidQueryError, ValidationError
-
+from mongoengine.queryset.visitor import Q
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
