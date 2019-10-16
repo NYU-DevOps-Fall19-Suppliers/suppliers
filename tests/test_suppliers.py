@@ -85,15 +85,6 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(suppliers[0].supplierName, "Costco")
         # pass
 
-    def test_delete_a_supplier(self):
-        """ Delete a Supplier """
-        supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
-        supplier.save()
-        self.assertEqual(len(Supplier.all()), 1)
-        # delete the supplier and make sure it isn't in the database
-        supplier.delete(supplier.id)
-        self.assertEqual(len(Supplier.all()), 0)
-    
     def test_list_all_supplier(self):
         """ Return a list of suppliers """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
@@ -107,12 +98,6 @@ class TestSuppliers(unittest.TestCase):
         """test exception raised by find. """
         non_exist = Supplier.find("random_id")
         self.assertEqual(non_exist, None)
-
-    def test_delete_supplier_exception(self):
-        """test exception raised by delete. """
-        non_exist = Supplier.delete("random_id")
-        self.assertEqual(non_exist, None)
-
 
     def test_query_by_name(self):
         """ Return a supplier given a name """

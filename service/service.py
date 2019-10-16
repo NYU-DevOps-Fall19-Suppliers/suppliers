@@ -107,7 +107,7 @@ def delete_a_supplier(supplierID):
     """ Route to delete a supplier """
     supplier = Supplier.find(supplierID)
     if supplier:
-        supplier.delete(supplierID)
+        supplier.delete()
     return make_response('DELETED', status.HTTP_204_NO_CONTENT)
   
 ######################################################################

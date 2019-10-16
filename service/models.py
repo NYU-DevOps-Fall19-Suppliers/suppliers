@@ -54,16 +54,6 @@ class Supplier(Document):
         return cls.objects()
 
     @classmethod
-    def delete(cls, supplier_id):
-        """ Delete a supplier by it's ID """
-        cls.logger.info('Processing deleting for id %s', supplier_id)
-        try:
-            res = cls.objects(id=supplier_id).first()
-        except ValidationError:
-            return None
-        res.delete()
-
-    @classmethod
     def find_by_name(cls, supplier_name):
         """ Find a supplier by its name """
         cls.logger.info('Processing looking for name %s', supplier_name)
@@ -115,13 +105,19 @@ class Supplier(Document):
     def find_by_product(cls, product_id):
         """Retrieves a list of supplier with a given product id """
         cls.logger.info("Getting suppliers with product id: %s".format(product_id))
-        return cls.objects(productIdList__in=product_id)
+        try:
+            return cls.objects(productIdList__in=product_id)
+        except ValidationError:
+            return None
 
     @classmethod
     def find_by_rating(cls, rating):
         """Retrieves a list of supplier with a given rating score """
         cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
-        return cls.objects(averageRating__gte=3)
+        try:
+            return cls.objects(averageRating__gte=rating)
+        except ValidationError:
+            return None
 
     @classmethod
     def action_make_recommendation(cls, product_id):

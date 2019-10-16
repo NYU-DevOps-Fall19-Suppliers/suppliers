@@ -131,7 +131,7 @@ class TestSupplierServer(unittest.TestCase):
 
     def test_delete_supplier(self):
         """ Delete a Supplier """
-        test_supplier = self._create_suppliers(1)[0]
+        test_supplier = self._create_suppliers(2)[0]
         resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
                                content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
@@ -139,10 +139,6 @@ class TestSupplierServer(unittest.TestCase):
         # make sure they are deleted
         resp = self.app.get('/suppliers/{}'.format(test_supplier.id),
                             content_type='application/json')
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        # delete nonexisted supplier
-        resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
-                               content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
