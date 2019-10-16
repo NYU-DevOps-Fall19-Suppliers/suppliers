@@ -80,6 +80,13 @@ class TestSupplierServer(unittest.TestCase):
                              content_type='application/json')
         self.assertRaises(DataValidationError)
 
+        test_supplier = Supplier()
+        self.assertNotEqual(test_supplier, None)
+        resp = self.app.post('/suppliers',
+                             json=test_supplier.to_json(),
+                             content_type='wrong')
+        self.assertRaises(DataValidationError)
+
         test_supplier = SupplierFactory()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
