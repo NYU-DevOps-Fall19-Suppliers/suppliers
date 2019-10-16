@@ -96,7 +96,7 @@ def get_a_supplier(supplierID):
     if supplier != None:
         return make_response(supplier.to_json(), status.HTTP_200_OK)
     else:
-        return make_response("NOT FOUND", status.HTTP_404_NOT_FOUND)
+        return not_found("Not Found")
 
 ######################################################################
 # DELETE A SUPPLIER
@@ -167,7 +167,10 @@ def query_a_supplier():
     app.logger.info('Query a supplier')
     name = request.args.get('name')
     supplier = Supplier.find_by_name(name)
-    return make_response(supplier.to_json(), status.HTTP_200_OK)
+    if supplier != None:
+        return make_response(supplier.to_json(), status.HTTP_200_OK)
+    else:
+        return bad_request("Bad Request")
 
 
 ######################################################################

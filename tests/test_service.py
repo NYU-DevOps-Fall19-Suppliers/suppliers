@@ -158,12 +158,6 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.get('/suppliers/4f4381f4e779897a2c000009')
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-        pass
-
-
-    def test_delete_supplier(self):
-        """ Delete a supplier """
-        pass
 
     def test_query_supplier_list_by_name(self):
         """ Query supplier by name """
@@ -220,14 +214,21 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(supplier['averageRating'],5)
         self.assertEqual(supplier['productIdList'],['2','3','4','5','7'])
 
+    @patch('service.models.Supplier.find_by_name')
+    def test_bad_request(self):
+        """ Test a Bad Request error from Find By Name """
+        resp = self.app.get('/suppliers?name=abcdef')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_non_found(self):
+        """ Test Not Found """
+        resp = self.app.get('/suppliers/123')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_internal_error(self):
+        """ Test Internal Error """
+        resp = self.app.post('/suppliers?name=abcdef')
+        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-    # @patch('service.models.Pet.find_by_name')
-    # def test_bad_request(self, bad_request_mock):
-    #     """ Test a Bad Request error from Find By Name """
-    #     bad_request_mock.side_effect = DataValidationError()
-    #     resp = self.app.get('/pets', query_string='name=fido')
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-    #
+    
