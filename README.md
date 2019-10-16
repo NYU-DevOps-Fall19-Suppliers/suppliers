@@ -45,6 +45,15 @@ To run the Flask app to create an interactive version of the API, please follow 
 
 Then the service will available at: http://0.0.0.0:2333/suppliers
 
+### Running Pylint:
+```
+vagrant up
+vagrant ssh
+cd /vagrant
+pylint --rcfile=pylint.conf service/*.py
+pylint --rcfile=pylint.conf tests/*.py
+````
+
 ### Built using:
 
   * [MongoDB](https://www.mongodb.com/) - MongoDB is a document database
