@@ -79,19 +79,9 @@ class Supplier(Document):
 
     @classmethod
     def all(cls):
-        #This is a function to return all suppliers
+        """This is a function to return all suppliers"""
         cls.logger.info('Processing all suppliers')
         return cls.objects()
-
-    @classmethod
-    def delete(cls, supplier_id):
-        """ Delete a supplier by it's ID """
-        cls.logger.info('Processing deleting for id %s', supplier_id)
-        try:
-            res = cls.objects(id=supplier_id).first()
-        except ValidationError:
-            return None
-        res.delete()
 
     @classmethod
     def find_by_name(cls, supplier_name):
@@ -109,7 +99,7 @@ class Supplier(Document):
     def find(cls, supplier_id):
         """Retrieves a single supplier with a given id (supplierID) """
 
-        cls.logger.info('Getting supplier with id: %s'.format(supplier_id))
+        cls.logger.info('Getting supplier with id: %s', supplier_id)
 
         try:
             res = cls.objects(id=supplier_id).first()
@@ -120,7 +110,7 @@ class Supplier(Document):
     @classmethod
     def find_by_product(cls, product_id):
         """Retrieves a list of supplier with a given product id """
-        cls.logger.info("Getting suppliers with product id: %s".format(product_id))
+        cls.logger.info("Getting suppliers with product id: %s", product_id)
         try:
             res = cls.objects(productIdList__in=product_id)
         except ValidationError:
@@ -130,7 +120,7 @@ class Supplier(Document):
     @classmethod
     def find_by_rating(cls, rating):
         """Retrieves a list of supplier with a given rating score """
-        cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
+        cls.logger.info("Getting suppliers with ratting score greater than: %d", rating)
         try:
             res = cls.objects(averageRating__gte=3)
         except ValidationError:
@@ -140,7 +130,7 @@ class Supplier(Document):
     @classmethod
     def action_make_recommendation(cls, product_id):
         """Retrieves a list of supplier with a given rating score and product id """
-        cls.logger.info("Getting suppliers with ratting score greater than: %s".format(product_id))
+        cls.logger.info("Getting suppliers with ratting score greater than: %s", product_id)
         try:
             res = cls.objects(Q(productIdList__in=product_id) & Q(averageRating__gte=3))
         except ValidationError:
