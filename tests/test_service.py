@@ -242,20 +242,32 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(supplier['averageRating'],5)
         self.assertEqual(supplier['productIdList'],['2','3','4','5','7'])
 
-    def test_not_found(self):
-        """ Test Not Found Error Handle """
-        test_supplier = SupplierFactory()
-        resp = self.app.get('/suppliers/1234/recommend')
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+#     def test_not_found(self):
+#         """ Test Not Found Error Handle """
+#         test_supplier = SupplierFactory()
+#         resp = self.app.get('/suppliers/1234/recommend')
+#         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_method_not_allowed(self):
-        """ Test Method Not Support Error Handle """
-        test_supplier = SupplierFactory()
-        resp = self.app.post('/suppliers/1234/recommend')
-        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+#     def test_method_not_allowed(self):
+#         """ Test Method Not Support Error Handle """
+#         test_supplier = SupplierFactory()
+#         resp = self.app.post('/suppliers/1234/recommend')
+#         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_internal_error(self):
         """ Test Internal Error Handle """
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers')
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def test_404_handler(self):
+        """ Test 404 handler """
+        resp = self.app.get('/suppliers/')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_405_handler(self):
+        """ Test 405 handler """
+        resp = self.app.delete('/suppliers')
+
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+

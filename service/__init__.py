@@ -8,7 +8,6 @@ import os
 import sys
 import logging
 from flask import Flask
-from service import service, models
 
 # Get configuration from environment
 DATABASE_URI = os.getenv('DATABASE_URI', 'mongodb://localhost')
@@ -25,6 +24,7 @@ app.config['MONGODB_SETTINGS'] = {
 }
 
 # Import the rutes After the Flask app is created
+from service import service, models
 
 # Set up logging for production
 # service.initialize_logging()
