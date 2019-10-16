@@ -69,7 +69,7 @@ class Supplier(Document):
         cls.logger.info('Processing looking for name %s', supplier_name)
         try:
             res = cls.objects.get(supplierName=supplier_name)
-        except ValidationError:
+        except DoesNotExist:
             return None
         return res
 
@@ -90,20 +90,14 @@ class Supplier(Document):
     def find_by_product(cls, product_id):
         """Retrieves a list of supplier with a given product id """
         cls.logger.info("Getting suppliers with product id: %s".format(product_id))
-        try:
-            res = cls.objects(productIdList__in=product_id)
-        except ValidationError:
-            return None
+        res = cls.objects(productIdList__in=product_id)
         return res
 
     @classmethod
     def find_by_rating(cls, rating):
         """Retrieves a list of supplier with a given rating score """
         cls.logger.info("Getting suppliers with ratting score greater than: %d".format(rating))
-        try:
-            res = cls.objects(averageRating__gte=3)
-        except ValidationError:
-            return None
+        res = cls.objects(averageRating__gte=rating)
         return res
 
     @classmethod

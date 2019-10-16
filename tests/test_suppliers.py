@@ -111,6 +111,8 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)
         self.assertEqual(supplier.productIdList, ['1','2','3'])
+        nowhere = Supplier.find_by_name("NoWhere")
+        self.assertEqual(nowhere, None)
     
     def test_query_by_product(self):
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
@@ -126,10 +128,10 @@ class TestSuppliers(unittest.TestCase):
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.find_by_rating(5)
+        self.assertEqual(len(suppliers), 1)
         supplier = suppliers[0]
         self.assertEqual(supplier.supplierName, "Walmart")
         self.assertEqual(supplier.address, "NYC")
         self.assertEqual(supplier.averageRating, 5)
         self.assertEqual(supplier.productIdList, ['1','2','3'])
-
 
