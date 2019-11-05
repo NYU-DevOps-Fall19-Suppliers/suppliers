@@ -140,7 +140,8 @@ def create_suppliers():
     supplier.save()
 
     #location_url = url_for('get_suppliers', supplierID=supplier.id, _external=True)
-    return make_response(supplier.to_json(), status.HTTP_201_CREATED)
+    return make_response(supplier.to_json(), status.HTTP_201_CREATED,
+        {'Location': url_for('get_a_supplier', supplierID=supplier.id, _external=True)})
 
 
 @app.route('/')
