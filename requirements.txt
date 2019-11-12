@@ -5,11 +5,17 @@ flask-mongoengine==0.9.5
 mongoengine==0.18.2
 
 
-# Testing
+# Test Driven Development
 nose==1.3.7
 pinocchio==0.4.2
 factory-boy==2.12.0
 pylint>=2.4.1
+
+# Behavior Driven Development
+behave==1.2.6
+selenium==3.141.0
+compare==0.2b0
+requests==2.22.0
 
 # Code coverage
 coverage==4.5.4
