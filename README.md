@@ -45,7 +45,7 @@ To run the Flask app to create an interactive version of the API, please follow 
  FLASK_APP=service:app flask run -h 0.0.0.0
 ```
 
-Then the service will available at: http://0.0.0.0:2333/suppliers
+Then the service will available at: http://127.0.0.1:5000/suppliers
 
 ### Running Pylint:
 ```
