@@ -42,7 +42,8 @@ class TestSupplierServer(unittest.TestCase):
     def setUp(self):
         """ Runs before each test """
         disconnect('default')
-        db = connect('testdb')
+        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/testdb?retryWrites=true&w=majority"
+        db = connect('testdb', host=DB_URI)
         db.drop_database('testdb')
         self.app = app.test_client()
 
