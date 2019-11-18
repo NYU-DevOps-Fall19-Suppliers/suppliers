@@ -48,8 +48,9 @@ class Supplier(Document):
         """ Initializes the database session """
         cls.logger.info('Initializing database')
         cls.app = app
+        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/myDatabase?retryWrites=true&w=majority"
         # This is where we initialize mongoDB from the Flask app
-        connect('myDatabase')
+        connect('myDatabase', host=DB_URI)
         app.app_context().push()
 
     @classmethod

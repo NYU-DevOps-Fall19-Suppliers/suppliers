@@ -37,7 +37,8 @@ class TestSuppliers(unittest.TestCase):
     def setUp(self):      
         disconnect('default')
         global db
-        db = connect('testdb')
+        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/testdb?retryWrites=true&w=majority"
+        db = connect('testdb', host=DB_URI)
         # self.app = app.test_client()
         db.drop_database('testdb')
 
