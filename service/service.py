@@ -6,8 +6,8 @@ GET /suppliers/{id} - Returns the supplier with a given id number
 POST /suppliers - creates a new supplier record in the database
 PUT /suppliers/{id} - updates a supplier record in the database
 DELETE /suppliers/{id} - deletes a supplier record in the database
-QUERY
-ACTION
+GET /suppliers?averageRating={averageRating} - queries a list of suppliers with given average rating
+ACTION /suppliers/{product_id}/recommend - recommends all suppliers that sells given product and has high ratings
 """
 
 import json
@@ -147,14 +147,15 @@ def create_suppliers():
 @app.route('/')
 def index():
     """index"""
-    return make_response(
-        jsonify(
-            name='Supplier Demo REST API Service',
-            version='1.0',
-            paths=url_for(
-                'list_suppliers',
-                _external=True)),
-        status.HTTP_200_OK)
+    return app.send_static_file('index.html')
+    # return make_response(
+    #     jsonify(
+    #         name='Supplier Demo REST API Service',
+    #         version='1.0',
+    #         paths=url_for(
+    #             'list_suppliers',
+    #             _external=True)),
+    #     status.HTTP_200_OK)
 
 
 @app.route('/suppliers', methods=['GET'])
@@ -194,7 +195,8 @@ def update_a_supplier(supplier_id):
         raise NotFound(
             "Supplier with id '{}' was not found.".format(supplier_id))
     supplier.update(**data)
-    supplier.reload()
+    # supplier.reload()
+    supplier = Supplier.find(supplier.id)
     return make_response(supplier.to_json(), status.HTTP_200_OK)
 
 ######################################################################
