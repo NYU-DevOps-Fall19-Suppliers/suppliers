@@ -179,9 +179,9 @@ $(function () {
 
         var queryString = ""
 
-        // if (supplierName) {
-        //     queryString += 'supplierName=' + supplierName
-        // }
+        if (supplierName) {
+            queryString += 'supplierName=' + supplierName
+        }
         // if (address) {
         //     if (queryString.length > 0) {
         //         queryString += '&address=' + address
@@ -196,9 +196,9 @@ $(function () {
         //         queryString += 'averageRating=' + averageRating
         //     }
         // }
-        if (averageRating) {
-            queryString += 'averageRating=' + averageRating.toString()
-        }
+        // if (averageRating) {
+        //     queryString += 'averageRating=' + averageRating.toString()
+        // }
 
 
         var ajax = $.ajax({
@@ -220,10 +220,11 @@ $(function () {
             header += '<th style="width:40%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
+            res = JSON.parse(res)
             for(var i = 0; i < res.length; i++) {
+                console.log(res[i]);
                 var supplier = res[i];
-                // var row = "<tr><td>"+supplier._id+"</td><td>"+supplier.supplierName+"</td><td>"+supplier.address+"</td><td>"+supplier.productIdList+"</td><td>"+supplier.averageRating+"</td></tr>";
-                var row = supplier;
+                var row = "<tr><td>"+supplier._id.$oid+"</td><td>"+supplier.supplierName+"</td><td>"+supplier.address+"</td><td>"+supplier.productIdList+"</td><td>"+supplier.averageRating+"</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstSupplier = supplier;
