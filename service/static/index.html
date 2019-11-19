@@ -40,26 +40,33 @@
 
             <div class="form-horizontal">
               <div class="form-group">
-                <label class="control-label col-sm-2" for="supplier_name">Name:</label>
+                <label class="control-label col-sm-2" for="supplierName">supplierName:</label>
                 <div class="col-sm-10">
                   <input type="text" class="form-control" id="supplier_name" placeholder="Enter name for Supplier">
                 </div>
               </div>
+
               <div class="form-group">
-                <label class="control-label col-sm-2" for="supplier_category">Category:</label>
+                <label class="control-label col-sm-2" for="address">address:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="supplier_category" placeholder="Enter category for Supplier">
+                  <input type="text" class="form-control" id="address" placeholder="Enter address for Supplier">
                 </div>
               </div>
+
               <div class="form-group">
-                <label class="control-label col-sm-2" for="supplier_available">Available:</label>
+                <label class="control-label col-sm-2" for="productIdList">productIdList:</label>
                 <div class="col-sm-10">
-                  <select class="form-control" id="supplier_available">
-                      <option value="true" selected>True</option>
-                      <option value="false">False</option>
-                  </select>
+                    <input type="text" class="form-control" id="productIdList" placeholder="Enter productIdList for Supplier">
                 </div>
               </div>
+
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="averageRating">averageRating:</label>
+                <div class="col-sm-10">
+                    <input type="number" class="form-control" id="averageRating" placeholder="Enter averageRating for Supplier">
+                </div>
+              </div>
+
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
                   <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
@@ -68,6 +75,7 @@
                   <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
                 </div>
               </div>
+
           </div> <!-- form div -->
         </div>
 
