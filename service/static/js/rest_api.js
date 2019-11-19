@@ -72,6 +72,7 @@ $(function () {
 
     $("#update-btn").click(function () {
 
+        var supplier_id = $("#supplier_id").val();
         var supplierName = $("#supplierName").val();
         var address = $("#address").val();
         var productIdList = $("#productIdList").val().replace(" ", "").split(",");
