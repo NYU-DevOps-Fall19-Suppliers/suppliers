@@ -6,14 +6,10 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        console.log(res);
-        $("#supplier_id").val(res._id);
-        console.log(res._id);
-        console.log(res.id);
+        res = JSON.parse(res);
+        $("#supplier_id").val(res._id.$oid);
         $("#supplierName").val(res.supplierName);
-        console.log(res.supplierName);
         $("#address").val(res.address);
-        console.log(res.address);
         $("#productIdList").val(res.productIdList);
         $("#averageRating").val(res.averageRating);
     }
