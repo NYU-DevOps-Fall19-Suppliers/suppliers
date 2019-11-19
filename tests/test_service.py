@@ -7,6 +7,7 @@ Test cases can be run with the following:
   codecov --token=$CODECOV_TOKEN
 """
 
+import time
 import unittest
 import os
 import logging
@@ -42,13 +43,18 @@ class TestSupplierServer(unittest.TestCase):
     def setUp(self):
         """ Runs before each test """
         disconnect('default')
-        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/testdb?retryWrites=true&w=majority"
-        db = connect('testdb', host=DB_URI)
-        db.drop_database('testdb')
+        global db
+        global testdb_name    # For concurrency
+        millis = int(round(time.time() * 1000))
+        testdb_name = "testdb" + str(millis)
+        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/"+ testdb_name +"?retryWrites=true&w=majority"
+        db = connect(testdb_name, host=DB_URI)
+        db.drop_database(testdb_name)
         self.app = app.test_client()
 
     def tearDown(self):
-        disconnect('testdb')
+        db.drop_database(testdb_name)
+        disconnect(testdb_name)
 
     def _create_suppliers(self, count):
         """ Factory method to create suppliers in bulk """
