@@ -204,8 +204,7 @@ def update_a_supplier(supplier_id):
         raise NotFound(
             "Supplier with id '{}' was not found.".format(supplier_id))
     supplier.update(**data)
-    # supplier.reload()
-    supplier = Supplier.find(supplier.id)
+    supplier.reload()
     return make_response(supplier.to_json(), status.HTTP_200_OK)
 
 ######################################################################
