@@ -66,7 +66,7 @@ class TestSupplierServer(unittest.TestCase):
                                  content_type='application/json')
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
 
-            new_supplier = json.loads(resp.data)
+            new_supplier = json.loads(resp.data.decode('utf-8'))
             test_supplier.id = new_supplier["_id"]["$oid"]
             suppliers.append(test_supplier)
         return suppliers
@@ -113,7 +113,7 @@ class TestSupplierServer(unittest.TestCase):
         location = resp.headers.get('Location', None)
         #self.assertTrue(location != None)
         # Check the data is correct
-        new_supplier = json.loads(resp.data)
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         self.assertNotEqual(new_supplier, None)
         self.assertNotEqual(test_supplier, None)
         self.assertEqual(new_supplier['supplierName'], test_supplier.supplierName, "SupplierNames do not match")
@@ -138,7 +138,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
-        new_supplier = json.loads(resp.data)
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         new_supplier_id = new_supplier["_id"]["$oid"]
         new_supplier.pop('_id', None)
         new_supplier['address'] = 'unknown'
@@ -146,7 +146,7 @@ class TestSupplierServer(unittest.TestCase):
                             json=new_supplier,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        updated_supplier = json.loads(resp.data)
+        updated_supplier = json.loads(resp.data.decode('utf-8'))
         self.assertEqual(updated_supplier['address'], 'unknown')
 
 
@@ -164,7 +164,7 @@ class TestSupplierServer(unittest.TestCase):
         self._create_suppliers(2)
         resp = self.app.get('/suppliers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
+        data = json.loads(resp.data.decode('utf-8'))
         self.assertEqual(len(data), 2)
 
     def test_delete_supplier(self):
@@ -173,7 +173,7 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
                                content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(len(resp.data), 0)
+        self.assertEqual(len(resp.data.decode('utf-8')), 0)
         # make sure they are deleted
         resp = self.app.get('/suppliers/{}'.format(test_supplier.id),
                             content_type='application/json')
@@ -209,7 +209,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
-        new_supplier = json.loads(resp.data)
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         new_supplier_id = new_supplier["_id"]["$oid"]
         new_supplier.pop('_id', None)
         new_supplier['supplierName'] = 'Wholefoods'
@@ -223,7 +223,7 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.get("/suppliers?rating=6")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        queried_suppliers = json.loads(resp.data)
+        queried_suppliers = json.loads(resp.data.decode('utf-8'))
         queried_supplier = queried_suppliers[0]
         self.assertEqual(queried_supplier['supplierName'], 'Wholefoods')
         self.assertEqual(queried_supplier['address'], 'unknown')
@@ -240,7 +240,7 @@ class TestSupplierServer(unittest.TestCase):
                              content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        new_supplier = json.loads(resp.data)
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         new_supplier_id = new_supplier["_id"]["$oid"]
         new_supplier.pop('_id', None)
         new_supplier['productIdList'] = ['2','3','4','5','7']
@@ -252,7 +252,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         resp = self.app.get('/suppliers/7/recommend')
-        recommend_suppliers = json.loads(resp.data)
+        recommend_suppliers = json.loads(resp.data.decode('utf-8'))
         supplier = recommend_suppliers[0]
         self.assertEqual(supplier['supplierName'],'Wholefoods')
         self.assertEqual(supplier['averageRating'],5)
