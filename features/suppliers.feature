@@ -23,16 +23,16 @@ Scenario: The server is running
 
 Scenario: Read a Supplier
     When I visit the "Home Page"
-    And I set the "supplierName" to "Walmart"
+    And I change "averageRating" to "4"
     And I press the "Search" button
-    Then I should see "Walmart" in the "supplierName" field
-    When I copy the "supplier_id" field
+    Then I should see "LA" in the "address" field
+    When I copy from the "supplier_id" field
     And I press the "Clear" button
-    And I paste the "supplier_id" field
+    And I paste to the "supplier_id" field
     And I press the "Retrieve" button
-    Then I should see "Walmart" in the "supplierName" field
-    And I should see "NYC" in the "address" field
-    And I should see "1,2,3" in the "productIdList" field
-    And I should see "3" in the "averageRating" field
+    Then I should see "Costco" in the "supplierName" field
+    And I should see "LA" in the "address" field
+    And I should see "1,2,3,4,5" in the "productIdList" field
+    And I should see "4" in the "averageRating" field
     
     

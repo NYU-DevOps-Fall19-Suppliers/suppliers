@@ -70,3 +70,42 @@ def step_impl(context, status_code):
     status = int(status_code.split(" ")[0])
     expect(context.resp.status_code).to_equal(status)
 
+@when('I press the "{button}" button')
+def step_impl(context, button):
+    button_id = button.lower() + '-btn'
+    context.driver.find_element_by_id(button_id).click()
+
+@when('I change "{field}" to "{value}"')
+def step_impl(context, field, value):
+    # element = context.driver.find_element_by_id(field)
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, field))
+    )
+    element.clear()
+    element.send_keys(value)
+
+@when('I copy from the "{field}" field')
+def step_impl(context, field):
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, field))
+    )
+    context.clipboard = element.get_attribute('value')
+    logging.info('Copy: {}'.format(context.clipboard))
+
+
+@when('I paste to the "{field}" field')
+def step_impl(context, field):
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.presence_of_element_located((By.ID, field))
+    )
+    element.clear()
+    element.send_keys(context.clipboard)
+
+@then('I should see "{value}" in the "{field}" field')
+def step_impl(context, field, value):
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element_value(
+            (By.ID, field), value
+        )
+    )
+    expect(found).to_be(True)
