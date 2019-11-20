@@ -40,3 +40,13 @@ Scenario: Read a Supplier
     And I should see "LA" in the "address" field
     And I should see "1,2,3,4,5" in the "productIdList" field
     And I should see "4" in the "averageRating" field
+
+Scenario: Delete a supplier
+    When I visit the "Home Page"
+    And I press the "Search" button
+    When I copy from the "supplier_id" field
+    And I press the "Clear" button
+    And I paste to the "supplier_id" field
+    And I press the "Delete" button
+    Then I should get "204 No Content"
+    And I should not see "500 Internal Server Error"
