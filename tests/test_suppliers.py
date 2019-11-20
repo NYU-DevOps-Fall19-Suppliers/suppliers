@@ -6,6 +6,7 @@ Test cases can be run with:
   coverage report -m
 """
 
+import time
 import unittest
 import os
 from werkzeug.exceptions import NotFound
@@ -37,14 +38,17 @@ class TestSuppliers(unittest.TestCase):
     def setUp(self):      
         disconnect('default')
         global db
-        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/testdb?retryWrites=true&w=majority"
-        db = connect('testdb', host=DB_URI)
+        global testdb_name    # For concurrency
+        millis = int(round(time.time() * 1000))
+        testdb_name = "testdb" + str(millis)
+        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/"+ testdb_name +"?retryWrites=true&w=majority"
+        db = connect(testdb_name, host=DB_URI)
         # self.app = app.test_client()
-        db.drop_database('testdb')
+        db.drop_database(testdb_name)
 
     def tearDown(self):
-        db.drop_database('testdb')
-        disconnect('testdb')
+        db.drop_database(testdb_name)
+        disconnect(testdb_name)
 
     def test_create_a_supplier(self):
         """ Create a supplier and assert that it exists """

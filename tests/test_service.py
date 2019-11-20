@@ -7,6 +7,7 @@ Test cases can be run with the following:
   codecov --token=$CODECOV_TOKEN
 """
 
+import time
 import unittest
 import os
 import logging
@@ -42,13 +43,18 @@ class TestSupplierServer(unittest.TestCase):
     def setUp(self):
         """ Runs before each test """
         disconnect('default')
-        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/testdb?retryWrites=true&w=majority"
-        db = connect('testdb', host=DB_URI)
-        db.drop_database('testdb')
+        global db
+        global testdb_name    # For concurrency
+        millis = int(round(time.time() * 1000))
+        testdb_name = "testdb" + str(millis)
+        DB_URI = "mongodb+srv://suppliers:s3cr3t@nyu-devops-yzcs4.mongodb.net/"+ testdb_name +"?retryWrites=true&w=majority"
+        db = connect(testdb_name, host=DB_URI)
+        db.drop_database(testdb_name)
         self.app = app.test_client()
 
     def tearDown(self):
-        disconnect('testdb')
+        db.drop_database(testdb_name)
+        disconnect(testdb_name)
 
     def _create_suppliers(self, count):
         """ Factory method to create suppliers in bulk """
@@ -132,7 +138,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
-        new_supplier = json.loads(resp.data..decode('utf-8'))
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         new_supplier_id = new_supplier["_id"]["$oid"]
         new_supplier.pop('_id', None)
         new_supplier['address'] = 'unknown'
@@ -158,7 +164,7 @@ class TestSupplierServer(unittest.TestCase):
         self._create_suppliers(2)
         resp = self.app.get('/suppliers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.data)
+        data = json.loads(resp.data.decode('utf-8'))
         self.assertEqual(len(data), 2)
 
     def test_delete_supplier(self):
@@ -167,7 +173,7 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
                                content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(len(resp.data), 0)
+        self.assertEqual(len(resp.data.decode('utf-8')), 0)
         # make sure they are deleted
         resp = self.app.get('/suppliers/{}'.format(test_supplier.id),
                             content_type='application/json')
@@ -203,7 +209,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
-        new_supplier = json.loads(resp.data)
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         new_supplier_id = new_supplier["_id"]["$oid"]
         new_supplier.pop('_id', None)
         new_supplier['supplierName'] = 'Wholefoods'
@@ -217,7 +223,7 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.get("/suppliers?rating=6")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        queried_suppliers = json.loads(resp.data)
+        queried_suppliers = json.loads(resp.data.decode('utf-8'))
         queried_supplier = queried_suppliers[0]
         self.assertEqual(queried_supplier['supplierName'], 'Wholefoods')
         self.assertEqual(queried_supplier['address'], 'unknown')
@@ -244,7 +250,7 @@ class TestSupplierServer(unittest.TestCase):
                              content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-        new_supplier = json.loads(resp.data)
+        new_supplier = json.loads(resp.data.decode('utf-8'))
         new_supplier_id = new_supplier["_id"]["$oid"]
         new_supplier.pop('_id', None)
         new_supplier['productIdList'] = ['2','3','4','5','7']
@@ -256,7 +262,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         resp = self.app.get('/suppliers/7/recommend')
-        recommend_suppliers = json.loads(resp.data.decode('utf-8')
+        recommend_suppliers = json.loads(resp.data.decode('utf-8'))
         supplier = recommend_suppliers[0]
         self.assertEqual(supplier['supplierName'],'Wholefoods')
         self.assertEqual(supplier['averageRating'],5)
