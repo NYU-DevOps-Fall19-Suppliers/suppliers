@@ -55,12 +55,6 @@ def step_impl(context, name, address, productsItems):
     payload = json.dumps(data)
     context.resp = requests.post(create_url, data = payload, headers = headers)
 
-@when('I list all suppliers')
-def step_impl(context):
-    """ Make a call to the base URL """
-    create_url = context.base_url + '/suppliers'
-    context.resp = requests.get(create_url)
-
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
@@ -76,3 +70,25 @@ def step_impl(context, status_code):
     status = int(status_code.split(" ")[0])
     expect(context.resp.status_code).to_equal(status)
 
+@when('I press the "{button}" button')
+def step_impl(context, button):
+    button_id = button.lower() + '-btn'
+    context.driver.find_element_by_id(button_id).click()
+
+@then('I should see "{name}" in the results')
+def step_impl(context, name):
+    # element = context.driver.find_element_by_id('search_results')
+    # expect(element.text).to_contain(name)
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+        expected_conditions.text_to_be_present_in_element(
+            (By.ID, 'search_results'),
+            name
+        )
+    )
+    expect(found).to_be(True)
+
+@then('I should not see "{name}" in the results')
+def step_impl(context, name):
+    element = context.driver.find_element_by_id('search_results')
+    error_msg = "I should not see '%s' in '%s'" % (name, element.text)
+    ensure(name in element.text, False, error_msg)

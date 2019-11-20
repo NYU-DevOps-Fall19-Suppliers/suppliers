@@ -15,10 +15,12 @@ Scenario: The server is running
     Then I should see "Supplier Demo REST API Service" in the title
     And I should not see "404 Not Found"
 
-Scenario: The server is running
-    When I list all suppliers
-    Then I should get "200 OK"
-    And I should not see "404 Not Found"
+Scenario: List all pets
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see "Walmart" in the results
+    And I should see "Costco" in the results
+    And I should not see "notASupplier" in the results
 
 Scenario: The server is running
     When I create a supplier with name "Apple", address "NYC", and product "2,3"
