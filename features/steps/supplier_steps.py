@@ -60,6 +60,10 @@ def step_impl(context, message):
     """ Check the document title for a message """
     expect(context.driver.page_source).to_contain(message)
 
+@then('I should see the message "{message}"')
+def step_impl(context, message):
+    expect(context.driver.page_source).to_contain(message)
+
 @then('I should not see "{message}"')
 def step_impl(context, message):
     error_msg = "I should not see '%s' in '%s'" % (message, context.resp.text)
