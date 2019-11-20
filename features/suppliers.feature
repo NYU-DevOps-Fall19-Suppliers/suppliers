@@ -9,6 +9,7 @@ Background:
         | Walmart      | NYC     | 1,2,3         | 3             |
         | Costco       | LA      | 1,2,3,4,5     | 4             |
         | Ikea         | SF      | 2,3,5         | 3             |
+        | Target       | Boston  | 5             | 2             |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -48,3 +49,11 @@ Scenario: Query suppliers by averageRating
     Then I should see "Costco" in the results
     And I should not see "Walmart" in the results
     And I should not see "Ikea" in the results
+
+Scenario: Recommend suppliers that provide give products
+    When I visit the "Home Page"
+    And I change "ProductId" to "5"
+    And I press the "Recommend" button
+    Then I should see "Costco" in the results
+    And I should see "Ikea" in the results
+    And I should not see "Target" in the results
