@@ -10,15 +10,17 @@ Background:
         | Costco       | LA      | 1,2,3,4,5     | 4             |
         | Ikea         | SF      | 2,3,5         | 3             |
 
-
 Scenario: The server is running
     When I visit the "Home Page"
     Then I should see "Supplier Demo REST API Service" in the title
     And I should not see "404 Not Found"
 
 Scenario: The server is running
+    When I list all suppliers
+    Then I should get "200 OK"
+    And I should not see "404 Not Found"
+
+Scenario: The server is running
     When I create a supplier with name "Apple", address "NYC", and product "2,3"
     Then I should get "201 Created"
     And I should not see "500 Internal Server Error"
-    
-    
