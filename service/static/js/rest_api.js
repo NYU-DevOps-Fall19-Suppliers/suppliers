@@ -197,11 +197,11 @@ $(function () {
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
-            header += '<th style="width:10%">supplier_id</th>'
-            header += '<th style="width:40%">supplierName</th>'
-            header += '<th style="width:40%">address</th>'
-            header += '<th style="width:10%">productIdList</th>'
-            header += '<th style="width:40%">averageRating</th></tr>'
+            header += '<th style="width:30%">supplier_id</th>'
+            header += '<th style="width:20%">supplierName</th>'
+            header += '<th style="width:20%">address</th>'
+            header += '<th style="width:30%">productIdList</th>'
+            header += '<th style="width:20%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
             res = JSON.parse(res)
@@ -251,11 +251,11 @@ $(function () {
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
-            header += '<th style="width:10%">supplier_id</th>'
-            header += '<th style="width:40%">supplierName</th>'
-            header += '<th style="width:40%">address</th>'
-            header += '<th style="width:10%">productIdList</th>'
-            header += '<th style="width:40%">averageRating</th></tr>'
+            header += '<th style="width:30%">supplier_id</th>'
+            header += '<th style="width:20%">supplierName</th>'
+            header += '<th style="width:20%">address</th>'
+            header += '<th style="width:30%">productIdList</th>'
+            header += '<th style="width:20%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
             res = JSON.parse(res)
