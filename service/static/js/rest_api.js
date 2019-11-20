@@ -180,9 +180,10 @@ $(function () {
 
         var queryString = ""
 
-        if (supplierName) {
-            queryString += 'supplierName=' + supplierName
+        if (averageRating) {
+            queryString += 'averageRating=' + averageRating.toString()
         }
+        console.log(queryString);
         // if (address) {
         //     if (queryString.length > 0) {
         //         queryString += '&address=' + address

@@ -160,11 +160,20 @@ def index():
 
 @app.route('/suppliers', methods=['GET'])
 def list_suppliers():
-    """ Route to list all suppliers """
+    """ Route to list all suppliers 
+    Args:
+        rating: returns all the suppliers with average rating higher than rating.
+        averageRating: returns all the suppliers with average rating equaling to averageRating. 
+    """
     app.logger.info('Request for supplier list')
     rating = request.args.get('rating')
+    averageRating = request.args.get('averageRating')
     if rating:
         suppliers = Supplier.find_by_rating(rating)
+        if(len(suppliers) == 0):
+            return bad_request("Bad Request")
+    elif averageRating:
+        suppliers = Supplier.find_by_equals_to_rating(averageRating)
         if(len(suppliers) == 0):
             return bad_request("Bad Request")
     else:
