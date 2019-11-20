@@ -6,7 +6,9 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        res = JSON.parse(res);
+        if (! res.supplierName){
+            res = JSON.parse(res);
+        }
         $("#supplier_id").val(res._id.$oid);
         $("#supplierName").val(res.supplierName);
         $("#address").val(res.address);
