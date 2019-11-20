@@ -15,7 +15,7 @@ Scenario: The server is running
     Then I should see "Supplier Demo REST API Service" in the title
     And I should not see "404 Not Found"
 
-Scenario: List all pets
+Scenario: List all suppliers
     When I visit the "Home Page"
     And I press the "Search" button
     Then I should see "Walmart" in the results
@@ -48,3 +48,15 @@ Scenario: Query suppliers by averageRating
     Then I should see "Costco" in the results
     And I should not see "Walmart" in the results
     And I should not see "Ikea" in the results
+
+Scenario: Update a Supplier
+    When I visit the "Home Page"
+    And I change "supplierName" to "Walmart"
+    And I press the "Search" button
+    Then I should see "Walmart" in the "supplierName" field
+    When I change "supplierName" to "Target"
+    And I press the "Update" button
+    Then I should see the message "success"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see "Target" in the results
