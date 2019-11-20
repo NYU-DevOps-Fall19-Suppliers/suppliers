@@ -6,7 +6,8 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#supplier_id").val(res._id);
+        res = JSON.parse(res);
+        $("#supplier_id").val(res._id.$oid);
         $("#supplierName").val(res.supplierName);
         $("#address").val(res.address);
         $("#productIdList").val(res.productIdList);
@@ -35,7 +36,7 @@ $(function () {
 
         var supplierName = $("#supplierName").val();
         var address = $("#address").val();
-        var productIdList = $("#productIdList").val();
+        var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
 
         var data = {
@@ -44,6 +45,8 @@ $(function () {
             "productIdList": productIdList,
             "averageRating": averageRating
         };
+
+        console.log(JSON.stringify(data));
 
         var ajax = $.ajax({
             type: "POST",
@@ -69,9 +72,10 @@ $(function () {
 
     $("#update-btn").click(function () {
 
+        var supplier_id = $("#supplier_id").val();
         var supplierName = $("#supplierName").val();
         var address = $("#address").val();
-        var productIdList = $("#productIdList").val();
+        var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
 
         var data = {
@@ -116,6 +120,8 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
+            console.log("Retrieve data is");
+            console.log(res);
             update_form_data(res)
             flash_message("Success")
         });
@@ -169,35 +175,32 @@ $(function () {
 
         var supplierName = $("#supplierName").val();
         var address = $("#address").val();
-        var productIdList = $("#productIdList").val();
+        var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
 
         var queryString = ""
 
-        if (supplierName) {
-            queryString += 'supplierName=' + supplierName
-        }
-        if (address) {
-            if (queryString.length > 0) {
-                queryString += '&address=' + address
-            } else {
-                queryString += 'address=' + address
-            }
-        }
-        if (productIdList) {
-            if (queryString.length > 0) {
-                queryString += '&productIdList=' + productIdList
-            } else {
-                queryString += 'productIdList=' + productIdList
-            }
-        }
         if (averageRating) {
-            if (queryString.length > 0) {
-                queryString += '&averageRating=' + averageRating
-            } else {
-                queryString += 'averageRating=' + averageRating
-            }
+            queryString += 'averageRating=' + averageRating.toString()
         }
+        console.log(queryString);
+        // if (address) {
+        //     if (queryString.length > 0) {
+        //         queryString += '&address=' + address
+        //     } else {
+        //         queryString += 'address=' + address
+        //     }
+        // }
+        // if (averageRating) {
+        //     if (queryString.length > 0) {
+        //         queryString += '&averageRating=' + averageRating
+        //     } else {
+        //         queryString += 'averageRating=' + averageRating
+        //     }
+        // }
+        // if (averageRating) {
+        //     queryString += 'averageRating=' + averageRating.toString()
+        // }
 
 
         var ajax = $.ajax({
@@ -212,16 +215,18 @@ $(function () {
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
+            header += '<th style="width:10%">supplier_id</th>'
             header += '<th style="width:40%">supplierName</th>'
             header += '<th style="width:40%">address</th>'
             header += '<th style="width:10%">productIdList</th>'
             header += '<th style="width:40%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
+            res = JSON.parse(res)
             for(var i = 0; i < res.length; i++) {
+                console.log(res[i]);
                 var supplier = res[i];
-                var row = "<tr><td>"+supplier._id+"</td><td>"+supplier.supplierName+"</td><td>"+supplier.address+"</td><td>"+supplier.productIdList+"</td><td>"+supplier.averageRating+"</td></tr>";
+                var row = "<tr><td>"+supplier._id.$oid+"</td><td>"+supplier.supplierName+"</td><td>"+supplier.address+"</td><td>"+supplier.productIdList+"</td><td>"+supplier.averageRating+"</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstSupplier = supplier;

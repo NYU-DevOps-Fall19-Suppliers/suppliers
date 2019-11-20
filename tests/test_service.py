@@ -231,6 +231,16 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.get('/suppliers?rating=7')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+        resp = self.app.get("/suppliers?averageRating=6")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        queried_suppliers = json.loads(resp.data)
+        self.assertEqual(len(queried_suppliers), 1)
+        queried_supplier = queried_suppliers[0]
+        self.assertEqual(queried_supplier['supplierName'], 'Wholefoods')
+
+        resp = self.app.get('/suppliers?averageRating=7')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
 
     def test_action_make_recommendation(self):
         """ Recommend a list of suppliers given a specific product id"""

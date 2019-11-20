@@ -98,6 +98,14 @@ class Supplier(Document):
         return res
 
     @classmethod
+    def find_by_equals_to_rating(cls, rating):
+        """Retrieves a list of supplier with a given rating score """
+        cls.logger.info(
+            "Getting suppliers with ratting score equals to: %d".format(rating))
+        res = cls.objects(averageRating=rating)
+        return res
+
+    @classmethod
     def action_make_recommendation(cls, product_id):
         """Retrieves a list of supplier with a given rating score and product id """
         cls.logger.info(
