@@ -26,3 +26,17 @@ Scenario: The server is running
     When I create a supplier with name "Apple", address "NYC", and product "2,3"
     Then I should get "201 Created"
     And I should not see "500 Internal Server Error"
+
+Scenario: Read a Supplier
+    When I visit the "Home Page"
+    And I change "averageRating" to "4"
+    And I press the "Search" button
+    Then I should see "LA" in the "address" field
+    When I copy from the "supplier_id" field
+    And I press the "Clear" button
+    And I paste to the "supplier_id" field
+    And I press the "Retrieve" button
+    Then I should see "Costco" in the "supplierName" field
+    And I should see "LA" in the "address" field
+    And I should see "1,2,3,4,5" in the "productIdList" field
+    And I should see "4" in the "averageRating" field
