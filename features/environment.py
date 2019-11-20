@@ -6,7 +6,7 @@ from behave import *
 from selenium import webdriver
 
 WAIT_SECONDS = 120
-BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:5000')
+BASE_URL = os.getenv('BASE_URL', 'http://0.0.0.0:5000')
 
 def before_all(context):
     """ Executed once before all tests """
