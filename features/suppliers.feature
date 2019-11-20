@@ -40,3 +40,11 @@ Scenario: Read a Supplier
     And I should see "LA" in the "address" field
     And I should see "1,2,3,4,5" in the "productIdList" field
     And I should see "4" in the "averageRating" field
+
+Scenario: Query suppliers by averageRating
+    When I visit the "Home Page"
+    And I change "averageRating" to "4"
+    And I press the "Search" button
+    Then I should see "Costco" in the results
+    And I should not see "Walmart" in the results
+    And I should not see "Ikea" in the results
