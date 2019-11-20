@@ -13,10 +13,22 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/bionic64"
-  config.vm.hostname = "ibmcloud"
 
-  # Forward Flask and Kubernetes ports
-  config.vm.network "forwarded_port", guest: 8001, host: 8001, host_ip: "127.0.0.1"
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. In the example below,
+  # accessing "localhost:8080" will access port 80 on the guest machine.
+  # NOTE: This will enable public access to the opened port
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine and only allow access
+  # via 127.0.0.1 to disable public access
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
 
   # Create a private network, which allows host-only access to the machine
@@ -43,11 +55,8 @@ Vagrant.configure("2") do |config|
     # vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "512"
     vb.cpus = 1
-    # Fixes some DNS issues on some networks
-    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
   #
   # View the documentation for the provider you are using for more
@@ -62,14 +71,6 @@ Vagrant.configure("2") do |config|
   if File.exists?(File.expand_path("~/.ssh/id_rsa"))
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
   end
-  if File.exists?(File.expand_path("~/.ssh/id_rsa.pub"))
-    config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-  end
-
-  # Copy your IBM Clouid API Key if you have one
-  if File.exists?(File.expand_path("~/.bluemix/apiKey.json"))
-    config.vm.provision "file", source: "~/.bluemix/apiKey.json", destination: "~/.bluemix/apiKey.json"
-  end
 
   ######################################################################
   # Add Python Flask environment
@@ -77,9 +78,8 @@ Vagrant.configure("2") do |config|
   # Setup a Python development environment
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y git zip tree python3 python3-pip python3-venv
+    apt-get install -y git python3 python3-pip python3-venv
     apt-get -y autoremove
-    pip3 install --upgrade pip3
 
     # Install PhantomJS for Selenium browser support
     echo "\n***********************************"
@@ -104,40 +104,15 @@ Vagrant.configure("2") do |config|
 
   SHELL
 
-  ######################################################################
-  # Setup a Bluemix and Kubernetes environment
-  ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    echo "\n************************************"
-    echo " Installing IBM Cloud CLI..."
-    echo "************************************\n"
-    # Install IBM Cloud CLI as Vagrant user
-    # curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-    sudo -H -u vagrant sh -c 'curl -sL http://ibm.biz/idt-installer | bash'
-    sudo -H -u vagrant sh -c 'ibmcloud config --usage-stats-collect false'
-    sudo -H -u vagrant sh -c "echo 'source <(kubectl completion bash)' >> ~/.bashrc"
-    sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
-    echo "\n"
-    echo "If you have an IBM Cloud API key in ~/.bluemix/apiKey.json"
-    echo "You can login with the following command:"
-    echo "\n"
-    echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apiKey.json -r us-south"
-    echo "\n"
-    echo "\n************************************"
-    echo " For the Kubernetes Dashboard use:"
-    echo " kubectl proxy --address='0.0.0.0'"
-    echo "************************************\n"
-  SHELL
-  
   # Add MongoDB docker container
   # docker run --name some-mongo -v /my/own/datadir:/data/db -d mongo
   # To use interactive bash: docker exec -it mongodb bash
   # The MongoDB Server log is available: docker logs mongodb
-  config.vm.provision "docker" do |d|
-   d.pull_images "mongo"
-   d.run "mongo",
-     args: "--name mongodb -d -p 27017:27017 -v mongo_data:/data/db "
-  end
+  #config.vm.provision "docker" do |d|
+  #  d.pull_images "mongo"
+  #  d.run "mongo",
+  #    args: "--name mongodb -d -p 27017:27017 -v mongo_data:/data/db "
+  #end
 
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
