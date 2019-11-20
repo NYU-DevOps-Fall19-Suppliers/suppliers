@@ -6,7 +6,9 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        res = JSON.parse(res);
+        if (! res.supplierName){
+            res = JSON.parse(res);
+        }
         $("#supplier_id").val(res._id.$oid);
         $("#supplierName").val(res.supplierName);
         $("#address").val(res.address);
@@ -184,24 +186,6 @@ $(function () {
             queryString += 'averageRating=' + averageRating.toString()
         }
         console.log(queryString);
-        // if (address) {
-        //     if (queryString.length > 0) {
-        //         queryString += '&address=' + address
-        //     } else {
-        //         queryString += 'address=' + address
-        //     }
-        // }
-        // if (averageRating) {
-        //     if (queryString.length > 0) {
-        //         queryString += '&averageRating=' + averageRating
-        //     } else {
-        //         queryString += 'averageRating=' + averageRating
-        //     }
-        // }
-        // if (averageRating) {
-        //     queryString += 'averageRating=' + averageRating.toString()
-        // }
-
 
         var ajax = $.ajax({
             type: "GET",
@@ -215,11 +199,65 @@ $(function () {
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
-            header += '<th style="width:10%">supplier_id</th>'
-            header += '<th style="width:40%">supplierName</th>'
-            header += '<th style="width:40%">address</th>'
-            header += '<th style="width:10%">productIdList</th>'
-            header += '<th style="width:40%">averageRating</th></tr>'
+            header += '<th style="width:30%">supplier_id</th>'
+            header += '<th style="width:20%">supplierName</th>'
+            header += '<th style="width:20%">address</th>'
+            header += '<th style="width:30%">productIdList</th>'
+            header += '<th style="width:20%">averageRating</th></tr>'
+            $("#search_results").append(header);
+            var firstSupplier = "";
+            res = JSON.parse(res)
+            for(var i = 0; i < res.length; i++) {
+                console.log(res[i]);
+                var supplier = res[i];
+                var row = "<tr><td>"+supplier._id.$oid+"</td><td>"+supplier.supplierName+"</td><td>"+supplier.address+"</td><td>"+supplier.productIdList+"</td><td>"+supplier.averageRating+"</td></tr>";
+                $("#search_results").append(row);
+                if (i == 0) {
+                    firstSupplier = supplier;
+                }
+            }
+
+            $("#search_results").append('</table>');
+
+            // copy the first result to the form
+            if (firstSupplier != "") {
+                update_form_data(firstSupplier)
+            }
+
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Action: recommend suppliers for a given product
+    // ****************************************
+
+    $("#recommend-btn").click(function () {
+
+        var ProductId = $("#ProductId").val();
+
+        var ajax = $.ajax({
+            type: "GET",
+            url: '/suppliers/' + ProductId + '/recommend',
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#search_results").empty();
+            $("#search_results").append('<table class="table-striped" cellpadding="10">');
+            var header = '<tr>'
+            header += '<th style="width:30%">supplier_id</th>'
+            header += '<th style="width:20%">supplierName</th>'
+            header += '<th style="width:20%">address</th>'
+            header += '<th style="width:30%">productIdList</th>'
+            header += '<th style="width:20%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
             res = JSON.parse(res)
