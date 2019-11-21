@@ -65,6 +65,7 @@ def step_impl(context, name, address, productsItems):
     payload = json.dumps(data)
     context.resp = requests.post(create_url, data = payload, headers = headers)
 
+
 @then('I should get "{status_code}"')
 def step_impl(context, status_code):
     status = int(status_code.split(" ")[0])
