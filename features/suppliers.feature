@@ -57,7 +57,7 @@ Scenario: Recommend suppliers that provide give products
     Then I should see "Costco" in the results
     And I should see "Ikea" in the results
     And I should not see "Target" in the results
-    
+
 Scenario: Update a Supplier
     When I visit the "Home Page"
     And I change "supplierName" to "Walmart"
@@ -69,3 +69,13 @@ Scenario: Update a Supplier
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see "Target" in the results
+
+Scenario: Delete a supplier
+    When I visit the "Home Page"
+    And I press the "Search" button
+    When I copy from the "supplier_id" field
+    And I press the "Clear" button
+    And I paste to the "supplier_id" field
+    And I press the "Delete" button
+    Then I should see the message "Supplier has been Deleted!"
+    And I should not see "500 Internal Server Error"
