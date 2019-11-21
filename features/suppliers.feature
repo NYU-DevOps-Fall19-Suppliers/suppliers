@@ -42,16 +42,6 @@ Scenario: Read a Supplier
     And I should see "1,2,3,4,5" in the "productIdList" field
     And I should see "4" in the "averageRating" field
 
-Scenario: Delete a supplier
-    When I visit the "Home Page"
-    And I press the "Search" button
-    When I copy from the "supplier_id" field
-    And I press the "Clear" button
-    And I paste to the "supplier_id" field
-    And I press the "Delete" button
-    Then I should get "204 No Content"
-    And I should not see "500 Internal Server Error"
-
 Scenario: Query suppliers by averageRating
     When I visit the "Home Page"
     And I change "averageRating" to "4"
@@ -67,7 +57,7 @@ Scenario: Recommend suppliers that provide give products
     Then I should see "Costco" in the results
     And I should see "Ikea" in the results
     And I should not see "Target" in the results
-    
+
 Scenario: Update a Supplier
     When I visit the "Home Page"
     And I change "supplierName" to "Walmart"
@@ -80,3 +70,12 @@ Scenario: Update a Supplier
     And I press the "Search" button
     Then I should see "Target" in the results
 
+Scenario: Delete a supplier
+    When I visit the "Home Page"
+    And I press the "Search" button
+    When I copy from the "supplier_id" field
+    And I press the "Clear" button
+    And I paste to the "supplier_id" field
+    And I press the "Delete" button
+    Then I should see the message "Supplier has been Deleted!"
+    And I should not see "500 Internal Server Error"
