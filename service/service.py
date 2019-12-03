@@ -80,9 +80,10 @@ create_model = api.model('Supplier', {
 
 # query string arguments
 supplier_args = reqparse.RequestParser()
-supplier_args.add_argument('supplierName', type=str, required=False, help='List Suppliers by name')
-supplier_args.add_argument('address', type=str, required=False, help='List Suppliers by address')
+# supplier_args.add_argument('supplierName', type=str, required=False, help='List Suppliers by name')
+# supplier_args.add_argument('address', type=str, required=False, help='List Suppliers by address')
 supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
+supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
 
 ######################################################################
 # Error Handlers
@@ -173,6 +174,38 @@ def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
 
+######################################################################
+#  PATH: /suppliers
+######################################################################
+@api.route('/suppliers', strict_slashes=False)
+class SupplierCollection(Resource):
+    """ Handles all interactions with collections of Suppliers """
+    #------------------------------------------------------------------
+    # LIST ALL SUPPLIERS
+    #------------------------------------------------------------------
+    @api.doc('list_suppliers')
+    @api.marshal_list_with(supplier_model)
+    def get(self):
+        """ Returns all of the Pets """
+        app.logger.info('Request to list Suppliers...')
+        suppliers = []
+        args = supplier_args.parse_args()
+        if args['rating']:
+            app.logger.info('Filtering by average rating score greater than or equal to: %s', args['rating'])
+            suppliers = Supplier.find_by_rating(args['rating'])
+            if(len(suppliers) == 0):
+                return bad_request("Bad Request")
+        elif args['averageRating']:
+            app.logger.info('Filtering by average rating score: %s', args['averageRating'])
+            suppliers = Supplier.find_by_equals_to_rating(args['averageRating'])
+            if(len(suppliers) == 0):
+                return bad_request("Bad Request")
+        else:
+            suppliers = Supplier.all()
+
+        app.logger.info('[%s] Suppliers returned', len(suppliers))
+        results = [supplier.to_json() for supplier in suppliers]
+        return results, status.HTTP_200_OK
 
 ######################################################################
 # GET A SUPPLIER
@@ -248,27 +281,27 @@ def index():
     #     status.HTTP_200_OK)
 
 
-@app.route('/suppliers', methods=['GET'])
-def list_suppliers():
-    """ Route to list all suppliers 
-    Args:
-        rating: returns all the suppliers with average rating higher than rating.
-        averageRating: returns all the suppliers with average rating equaling to averageRating. 
-    """
-    app.logger.info('Request for supplier list')
-    rating = request.args.get('rating')
-    averageRating = request.args.get('averageRating')
-    if rating:
-        suppliers = Supplier.find_by_rating(rating)
-        if(len(suppliers) == 0):
-            return bad_request("Bad Request")
-    elif averageRating:
-        suppliers = Supplier.find_by_equals_to_rating(averageRating)
-        if(len(suppliers) == 0):
-            return bad_request("Bad Request")
-    else:
-        suppliers = Supplier.all()
-    return make_response(suppliers.to_json(), status.HTTP_200_OK)
+# @app.route('/suppliers', methods=['GET'])
+# def list_suppliers():
+#     """ Route to list all suppliers 
+#     Args:
+#         rating: returns all the suppliers with average rating higher than rating.
+#         averageRating: returns all the suppliers with average rating equaling to averageRating. 
+#     """
+#     app.logger.info('Request for supplier list')
+#     rating = request.args.get('rating')
+#     averageRating = request.args.get('averageRating')
+#     if rating:
+#         suppliers = Supplier.find_by_rating(rating)
+#         if(len(suppliers) == 0):
+#             return bad_request("Bad Request")
+#     elif averageRating:
+#         suppliers = Supplier.find_by_equals_to_rating(averageRating)
+#         if(len(suppliers) == 0):
+#             return bad_request("Bad Request")
+#     else:
+#         suppliers = Supplier.all()
+#     return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 
 @app.route('/suppliers/<string:productId>/recommend', methods=['GET'])
