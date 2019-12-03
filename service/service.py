@@ -186,7 +186,7 @@ class SupplierCollection(Resource):
     @api.doc('list_suppliers')
     @api.marshal_list_with(supplier_model)
     def get(self):
-        """ Returns all of the Pets """
+        """ Returns all of the Suppliers """
         app.logger.info('Request to list Suppliers...')
         suppliers = []
         args = supplier_args.parse_args()
@@ -194,12 +194,12 @@ class SupplierCollection(Resource):
             app.logger.info('Filtering by average rating score greater than or equal to: %s', args['rating'])
             suppliers = Supplier.find_by_rating(args['rating'])
             if(len(suppliers) == 0):
-                return bad_request("Bad Request")
+                return status.HTTP_404_NOT_FOUND
         elif args['averageRating']:
             app.logger.info('Filtering by average rating score: %s', args['averageRating'])
             suppliers = Supplier.find_by_equals_to_rating(args['averageRating'])
             if(len(suppliers) == 0):
-                return bad_request("Bad Request")
+                return status.HTTP_404_NOT_FOUND
         else:
             suppliers = Supplier.all()
 
