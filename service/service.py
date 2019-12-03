@@ -115,7 +115,6 @@ def not_found(error):
                    error='Not Found',
                    message=message), status.HTTP_404_NOT_FOUND
 
-
 @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
 def method_not_supported(error):
     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
@@ -124,7 +123,6 @@ def method_not_supported(error):
     return jsonify(status=status.HTTP_405_METHOD_NOT_ALLOWED,
                    error='Method not Allowed',
                    message=message), status.HTTP_405_METHOD_NOT_ALLOWED
-
 
 @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 def mediatype_not_supported(error):
@@ -209,7 +207,6 @@ class SupplierResource(Resource):
         if not supplier:
             api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
         return supplier, status.HTTP_200_OK 
-
 
 ######################################################################
 #  PATH: /suppliers
