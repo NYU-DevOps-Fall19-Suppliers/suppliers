@@ -54,8 +54,10 @@ api = Api(app,
          )
 
 # Define the model so that the docs reflect what can be sent
+# id_fields = {}
+# id_fields['$oid'] = fields.String(readOnly=True)
 supplier_model = api.model('Supplier', {
-    'supplier_id': fields.String(readOnly=True,
+    'id': fields.String(title = 'supplierId',
                          description='The unique id assigned internally by service'),
     'supplierName': fields.String(required=True,
                           description='The name of the Supplier'),
@@ -67,7 +69,7 @@ supplier_model = api.model('Supplier', {
                                 description='The average rating of the Supplier')
 })
 
-create_model = api.model('Supplier', {
+create_model = api.model('supplier', {
     'supplierName': fields.String(required=True,
                           description='The name of the Supplier'),
     'address': fields.String(required=False,
@@ -175,37 +177,43 @@ def healthcheck():
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
 
 ######################################################################
+#  PATH: /suppliers/{id}
+######################################################################
+@api.route('/suppliers/<supplier_id>')
+@api.param('supplier_id', 'The Supplier Identifier')
+class SupplierResource(Resource):
+    """
+    SupplierResource class
+
+    Allows the manipulation of a single Supplier
+    GET /suppliers/{id} - Returns a Supplier with the id
+    PUT /suppliers/{id} - Update a Supplier with the id
+    DELETE /suppliers/{id} -  Deletes a Supplier with the id
+    """
+
+    #------------------------------------------------------------------
+    # RETRIEVE A SUPPLIER
+    #------------------------------------------------------------------ 
+
+    @api.doc('get_suppliers')
+    @api.response(404, 'Supplier Not Found')
+    @api.marshal_with(supplier_model)
+    def get(self, supplier_id):
+        """
+        Retrieve a single Supplier
+
+        This endpoint will return a Supplier based on it's id
+        """ 
+        app.logger.info("Request to Retrieve a Supplier with id [%s]", supplier_id)   
+        supplier = Supplier.find(supplier_id)
+        if not supplier:
+            api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
+        return supplier, status.HTTP_200_OK 
+
+
+######################################################################
 #  PATH: /suppliers
 ######################################################################
-@api.route('/suppliers', strict_slashes=False)
-class SupplierCollection(Resource):
-    """ Handles all interactions with collections of Suppliers """
-    #------------------------------------------------------------------
-    # LIST ALL SUPPLIERS
-    #------------------------------------------------------------------
-    @api.doc('list_suppliers')
-    @api.marshal_list_with(supplier_model)
-    def get(self):
-        """ Returns all of the Suppliers """
-        app.logger.info('Request to list Suppliers...')
-        suppliers = []
-        args = supplier_args.parse_args()
-        if args['rating']:
-            app.logger.info('Filtering by average rating score greater than or equal to: %s', args['rating'])
-            suppliers = Supplier.find_by_rating(args['rating'])
-            if(len(suppliers) == 0):
-                return status.HTTP_404_NOT_FOUND
-        elif args['averageRating']:
-            app.logger.info('Filtering by average rating score: %s', args['averageRating'])
-            suppliers = Supplier.find_by_equals_to_rating(args['averageRating'])
-            if(len(suppliers) == 0):
-                return status.HTTP_404_NOT_FOUND
-        else:
-            suppliers = Supplier.all()
-
-        app.logger.info('[%s] Suppliers returned', len(suppliers))
-        results = [supplier.to_json() for supplier in suppliers]
-        return results, status.HTTP_200_OK
 
 ######################################################################
 # GET A SUPPLIER
@@ -281,27 +289,27 @@ def index():
     #     status.HTTP_200_OK)
 
 
-# @app.route('/suppliers', methods=['GET'])
-# def list_suppliers():
-#     """ Route to list all suppliers 
-#     Args:
-#         rating: returns all the suppliers with average rating higher than rating.
-#         averageRating: returns all the suppliers with average rating equaling to averageRating. 
-#     """
-#     app.logger.info('Request for supplier list')
-#     rating = request.args.get('rating')
-#     averageRating = request.args.get('averageRating')
-#     if rating:
-#         suppliers = Supplier.find_by_rating(rating)
-#         if(len(suppliers) == 0):
-#             return bad_request("Bad Request")
-#     elif averageRating:
-#         suppliers = Supplier.find_by_equals_to_rating(averageRating)
-#         if(len(suppliers) == 0):
-#             return bad_request("Bad Request")
-#     else:
-#         suppliers = Supplier.all()
-#     return make_response(suppliers.to_json(), status.HTTP_200_OK)
+@app.route('/suppliers', methods=['GET'])
+def list_suppliers():
+    """ Route to list all suppliers 
+    Args:
+        rating: returns all the suppliers with average rating higher than rating.
+        averageRating: returns all the suppliers with average rating equaling to averageRating. 
+    """
+    app.logger.info('Request for supplier list')
+    rating = request.args.get('rating')
+    averageRating = request.args.get('averageRating')
+    if rating:
+        suppliers = Supplier.find_by_rating(rating)
+        if(len(suppliers) == 0):
+            return bad_request("Bad Request")
+    elif averageRating:
+        suppliers = Supplier.find_by_equals_to_rating(averageRating)
+        if(len(suppliers) == 0):
+            return bad_request("Bad Request")
+    else:
+        suppliers = Supplier.all()
+    return make_response(suppliers.to_json(), status.HTTP_200_OK)
 
 
 @app.route('/suppliers/<string:productId>/recommend', methods=['GET'])
@@ -334,7 +342,6 @@ def update_a_supplier(supplier_id):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-
 
 def init_db():
     """ Initialies the mongoengine """
