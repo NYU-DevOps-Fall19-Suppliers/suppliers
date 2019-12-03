@@ -10,11 +10,15 @@ GET /suppliers?averageRating={averageRating} - queries a list of suppliers with 
 ACTION /suppliers/{product_id}/recommend - recommends all suppliers that sells given product and has high ratings
 """
 
+import sys
+import uuid
+import logging
+from functools import wraps
 import json
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
+from flask_restplus import Api, Resource, fields, reqparse, inputs
 from werkzeug.exceptions import NotFound
-
 from service.models import Supplier, DataValidationError
 
 from . import app
@@ -25,6 +29,61 @@ from . import app
 # MongoEngine connects to the MongoDB server running on port 27017 on localhost,
 # to the database named myDatabase.
 # This database is exposed as the db attribute. (mongo.db)
+
+# Document the type of autorization required
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'X-Api-Key'
+    }
+}
+
+######################################################################
+# Configure Swagger before initilaizing it
+######################################################################
+api = Api(app,
+          version='1.0.0',
+          title='Supplier Demo REST API Service',
+          description='This is a sample server Supplier server.',
+          default='suppliers',
+          default_label='Suppliers operations',
+          doc='/', # default also could use doc='/apidocs/'
+          authorizations=authorizations
+          # prefix='/api'
+         )
+
+# Define the model so that the docs reflect what can be sent
+supplier_model = api.model('Supplier', {
+    'supplier_id': fields.String(readOnly=True,
+                         description='The unique id assigned internally by service'),
+    'supplierName': fields.String(required=True,
+                          description='The name of the Supplier'),
+    'address': fields.String(required=False,
+                              description='The address of the Supplier'),
+    'productIdList': fields.List(fields.String, required=False,
+                                description='The product list of the Supplier'),
+    'averageRating': fields.Integer(required = False,
+                                description='The average rating of the Supplier')
+})
+
+create_model = api.model('Supplier', {
+    'supplierName': fields.String(required=True,
+                          description='The name of the Supplier'),
+    'address': fields.String(required=False,
+                              description='The address of the Supplier'),
+    'productIdList': fields.List(fields.String, required=False,
+                                description='The product list of the Supplier'),
+    'averageRating' : fields.Integer(required = False,
+                                description='The average rating of the Supplier')
+})
+
+# query string arguments
+supplier_args = reqparse.RequestParser()
+supplier_args.add_argument('supplierName', type=str, required=False, help='List Suppliers by name')
+supplier_args.add_argument('address', type=str, required=False, help='List Suppliers by address')
+supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
+
 ######################################################################
 # Error Handlers
 ######################################################################
@@ -82,6 +141,37 @@ def internal_server_error(error):
     return jsonify(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                    error='Internal Server Error',
                    message=message), status.HTTP_500_INTERNAL_SERVER_ERROR
+
+######################################################################
+# Authorization Decorator
+######################################################################
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'X-Api-Key' in request.headers:
+            token = request.headers['X-Api-Key']
+
+        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+            return f(*args, **kwargs)
+        else:
+            return {'message': 'Invalid or missing token'}, 401
+    return decorated
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+    """ Helper function used when testing API keys """
+    return uuid.uuid4().hex
+
+######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route('/healthcheck')
+def healthcheck():
+    """ Let them know our heart is still beating """
+    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
 
 
 ######################################################################
