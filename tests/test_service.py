@@ -149,15 +149,11 @@ class TestSupplierServer(unittest.TestCase):
         updated_supplier = json.loads(resp.data.decode('utf-8'))
         self.assertEqual(updated_supplier['address'], 'unknown')
 
-
         new_supplier_id = 0
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                         json=new_supplier,
                         content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-
-
 
     def test_get_supplier_list(self):
         """ Get a list of suppliers """
