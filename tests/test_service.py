@@ -264,9 +264,8 @@ class TestSupplierServer(unittest.TestCase):
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-        resp = self.app.get('/suppliers/5/recommend')
+        resp = self.app.get('/suppliers/7/recommend')
         recommend_suppliers = json.loads(resp.data.decode('utf-8'))
-        # app.logger(recommend_suppliers)
         supplier = recommend_suppliers[0]
         self.assertEqual(supplier['supplierName'],'Wholefoods')
         self.assertEqual(supplier['averageRating'],5)
