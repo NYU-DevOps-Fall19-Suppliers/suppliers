@@ -291,3 +291,10 @@ class TestSupplierServer(unittest.TestCase):
 
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
+    def test_health(self):
+        """ Test Healthcheck """
+        resp = self.app.get('/healthcheck')
+        resp_json = json.loads(resp.data.decode('utf-8'))
+        
+        self.assertEqual(resp_json["message"], 'Healthy')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
