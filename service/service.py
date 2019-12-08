@@ -304,19 +304,23 @@ def delete_a_supplier(supplierID):
 # UPDATE AN EXISTING SUPPLIER
 ######################################################################
 @app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
+@api.doc('update_a_supplier')
+@api.response(404, 'Supplier not found')
+@api.response(400, 'The posted supplier data was not valid')
+@api.expect(supplier_model)
+@api.marshal_with(supplier_model)
 def update_a_supplier(supplier_id):
     """ Update a supplier. """
-    app.logger.info('Request to update a supplier')
+    app.logger.info('Request to update a supplier with id [%s]', supplier_id)
     check_content_type('application/json')
-    data = request.get_json()
     supplier = Supplier.find(supplier_id)
+    data = request.get_json()
     if not supplier:
-        raise NotFound(
-            "Supplier with id '{}' was not found.".format(supplier_id))
+        return api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' not found".format(supplier_id))
     supplier.update(**data)
     # supplier.reload()
     supplier = Supplier.find(supplier.id)
-    return make_response(supplier.to_json(), status.HTTP_200_OK)
+    return supplier, status.HTTP_200_OK
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
