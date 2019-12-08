@@ -190,7 +190,28 @@ class SupplierResource(Resource):
         supplier = Supplier.find(supplier_id)
         if not supplier:
             api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
-        return supplier, status.HTTP_200_OK 
+        return supplier, status.HTTP_200_OK
+
+    
+    #------------------------------------------------------------------
+    # DELETE A SUPPLIER
+    #------------------------------------------------------------------
+
+    @api.doc('delete_suppliers', security='apikey')
+    @api.response(204, 'Supplier deleted')
+    # @token_required
+    def delete(self, supplier_id):
+        """
+        Delete a Supplier
+
+        This endpoint will delete a Supplier based the id specified in the path
+        """
+        app.logger.info('Request to Delete a supplier with id [%s]', supplier_id)
+        supplier = Supplier.find(supplier_id)
+        if supplier:
+            supplier.delete()
+        
+        return '', status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  PATH: /suppliers
@@ -279,26 +300,6 @@ class ProductResource(Resource):
         results = [json.loads(supplier.to_json()) for supplier in suppliers]
         return results, status.HTTP_200_OK
 
-######################################################################
-# DELETE A SUPPLIER
-######################################################################
-
-@app.route('/suppliers/<string:supplierID>', methods=['DELETE'])
-def delete_a_supplier(supplierID):
-    """ Route to delete a supplier """
-    supplier = Supplier.find(supplierID)
-    if supplier:
-        supplier.delete()
-    return make_response('DELETED', status.HTTP_204_NO_CONTENT)
-
-# @app.route('/suppliers/<string:productId>/recommend', methods=['GET'])
-# def action_recommend_product(productId):
-#     """ Route to recommend a list of suppliers given a product"""
-#     app.logger.info('Recommend product')
-#     suppliers = Supplier.action_make_recommendation(productId)
-#     if len(suppliers) > 0:
-#         return make_response(suppliers.to_json(), status.HTTP_200_OK)
-#     return not_found("Not Found")
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
@@ -326,7 +327,6 @@ def init_db():
     """ Initialies the mongoengine """
     global app
     Supplier.init_db(app)
-
 
 def check_content_type(content_type):
     """ Checks whether the request content type is correct """
