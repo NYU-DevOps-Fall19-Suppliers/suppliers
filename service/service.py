@@ -281,14 +281,25 @@ class SupplierCollection(Resource):
         location_url = api.url_for(SupplierResource, supplier_id=supplier.id, _external=True)
         return supplier, status.HTTP_201_CREATED, {'Location': location_url}
 
-@app.route('/suppliers/<string:productId>/recommend', methods=['GET'])
-def action_recommend_product(productId):
-    """ Route to recommend a list of suppliers given a product"""
-    app.logger.info('Recommend product')
-    suppliers = Supplier.action_make_recommendation(productId)
-    if len(suppliers) > 0:
-        return make_response(suppliers.to_json(), status.HTTP_200_OK)
-    return not_found("Not Found")
+######################################################################
+#  PATH: /suppliers/{product_id}/recommend
+######################################################################
+@api.route('/suppliers/<productId>/recommend')
+@api.param('productId', 'The product identifier')
+class ProductResource(Resource):
+    """ Recommend a supplier given a product id"""
+    @api.doc('recommend_suppliers')
+    @api.response(404, 'Supplier not found')
+    def get(self, productId):
+        """ Route to recommend a list of suppliers given a product"""
+        app.logger.info('Recommend suppliers')
+        suppliers = Supplier.action_make_recommendation(productId)
+        if len(suppliers) <= 0:
+            return api.abort(status.HTTP_404_NOT_FOUND, 'Supplier Not Found')
+        app.logger.info('[%s] suppliers returned', len(suppliers))
+        results = [json.loads(supplier.to_json()) for supplier in suppliers]
+        return results, status.HTTP_200_OK
+
 
 ######################################################################
 # UPDATE AN EXISTING SUPPLIER
