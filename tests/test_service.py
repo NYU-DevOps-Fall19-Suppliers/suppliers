@@ -16,7 +16,7 @@ from flask_api import status    # HTTP Status Codes
 from unittest.mock import MagicMock, patch
 from service.models import Supplier, DataValidationError #, db
 from .suppliers_factory import SupplierFactory
-from service.service import app, init_db#, initialize_logging
+from service.service import app, init_db, generate_apikey#, initialize_logging
 from mongoengine import connect
 from mongoengine.connection import disconnect
 # DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
@@ -32,6 +32,9 @@ class TestSupplierServer(unittest.TestCase):
     def setUpClass(cls):
         """ Run once before all tests """
         app.debug = False
+        api_key = generate_apikey()
+        app.config['API_KEY'] = api_key
+
         # initialize_logging(logging.INFO)
         # Set up the test database
         # app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
@@ -51,6 +54,9 @@ class TestSupplierServer(unittest.TestCase):
         db = connect(testdb_name, host=DB_URI)
         db.drop_database(testdb_name)
         self.app = app.test_client()
+        self.headers = {
+            'X-Api-Key': app.config['API_KEY']
+        }
 
     def tearDown(self):
         db.drop_database(testdb_name)
@@ -63,7 +69,8 @@ class TestSupplierServer(unittest.TestCase):
             test_supplier = SupplierFactory()
             resp = self.app.post('/suppliers',
                                  json=test_supplier.to_json(),
-                                 content_type='application/json')
+                                 content_type='application/json',
+                                 headers=self.headers)
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
 
             new_supplier = json.loads(resp.data.decode('utf-8'))
@@ -80,35 +87,38 @@ class TestSupplierServer(unittest.TestCase):
     def test_create_supplier(self):
         """ Create a new supplier """
 
-        resp = self.app.post('/suppliers',
-)
+        resp = self.app.post('/suppliers',headers=self.headers)
         self.assertRaises(DataValidationError)
 
         test_supplier = Supplier()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertRaises(DataValidationError)
 
         test_supplier = Supplier()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
-                             content_type='wrong')
+                             content_type='wrong',
+                             headers=self.headers)
         self.assertRaises(DataValidationError)
 
         test_supplier = Supplier()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
-                             json=test_supplier.to_json())
+                             json=test_supplier.to_json(),
+                             headers=self.headers)
         self.assertRaises(DataValidationError)
 
         test_supplier = SupplierFactory()
         self.assertNotEqual(test_supplier, None)
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
@@ -135,7 +145,8 @@ class TestSupplierServer(unittest.TestCase):
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
@@ -147,7 +158,8 @@ class TestSupplierServer(unittest.TestCase):
         new_supplier['address'] = 'unknown'
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_supplier = json.loads(resp.data.decode('utf-8'))
         self.assertEqual(updated_supplier['address'], 'unknown')
@@ -155,7 +167,8 @@ class TestSupplierServer(unittest.TestCase):
         new_supplier_id = 0
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                         json=new_supplier,
-                        content_type='application/json')
+                        content_type='application/json',
+                        headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_supplier_list(self):
@@ -170,12 +183,14 @@ class TestSupplierServer(unittest.TestCase):
         """ Delete a Supplier """
         test_supplier = self._create_suppliers(2)[0]
         resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
-                               content_type='application/json')
+                               content_type='application/json',
+                               headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data.decode('utf-8')), 0)
         # make sure they are deleted
         resp = self.app.get('/suppliers/{}'.format(test_supplier.id),
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -204,7 +219,8 @@ class TestSupplierServer(unittest.TestCase):
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         # update the supplier
@@ -218,7 +234,8 @@ class TestSupplierServer(unittest.TestCase):
         new_supplier['averageRating'] = 6
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         
         resp = self.app.get("/suppliers?rating=6")
@@ -248,7 +265,8 @@ class TestSupplierServer(unittest.TestCase):
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
-                             content_type='application/json')
+                             content_type='application/json',
+                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         new_supplier = json.loads(resp.data.decode('utf-8'))
@@ -261,7 +279,8 @@ class TestSupplierServer(unittest.TestCase):
         new_supplier['supplierName'] = 'Wholefoods'
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
-                            content_type='application/json')
+                            content_type='application/json',
+                            headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
         resp = self.app.get('/suppliers/7/recommend')
@@ -274,11 +293,11 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.get('/suppliers/100/recommend')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_500_handler(self):
-        """ Test 500 handler """
+    def test_401_handler(self):
+        """ Test 401 handler """
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers')
-        self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_404_handler(self):
         """ Test 404 handler """
