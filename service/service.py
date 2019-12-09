@@ -17,7 +17,7 @@ from functools import wraps
 import json
 from flask import jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
-from flask_restplus import Api, Resource, fields, reqparse, inputs
+from flask_restplus import Api, Resource, fields, reqparse, inputs, apidoc
 from werkzeug.exceptions import NotFound
 from service.models import Supplier, DataValidationError
 
@@ -49,8 +49,8 @@ api = Api(app,
           default='suppliers',
           default_label='Suppliers operations',
           doc='/', # default also could use doc='/apidocs/'
-          authorizations=authorizations
-          # prefix='/api'
+          authorizations=authorizations,
+        #   prefix='/suppliers'
          )
 
 # Define the model so that the docs reflect what can be sent
@@ -141,6 +141,16 @@ def generate_apikey():
 def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+
+@app.route('/apidocs/')
+def apidoc_page():
+    """API Documentation Page"""
+    return apidoc.ui_for(api)
+
+@app.route('/')
+def index():
+    return app.send_static_file("index.html"), status.HTTP_200_OK
+
 
 ######################################################################
 #  PATH: /suppliers/{id}
