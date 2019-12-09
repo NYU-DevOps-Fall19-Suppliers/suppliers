@@ -48,7 +48,7 @@ api = Api(app,
           description='This is a sample server Supplier server.',
           default='suppliers',
           default_label='Suppliers operations',
-          doc='/', # default also could use doc='/apidocs/'
+        #   doc='/', # default also could use doc='/apidocs/'
           authorizations=authorizations,
         #   prefix='/suppliers'
          )
