@@ -198,7 +198,8 @@ class TestSupplierServer(unittest.TestCase):
         """ Delete the walmart entry for the bdd test"""
 
         resp = self.app.delete('/suppliers/{}'.format("5dd5b9ced8704e4de9e"),
-                               content_type='application/json')
+                               content_type='application/json',
+                               headers=self.headers)
         
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         
