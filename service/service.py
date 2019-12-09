@@ -110,24 +110,6 @@ def not_found(error):
                    error='Not Found',
                    message=message), status.HTTP_404_NOT_FOUND
 
-# @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
-# def method_not_supported(error):
-#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-#     message = str(error)
-#     app.logger.warning(message)
-#     return jsonify(status=status.HTTP_405_METHOD_NOT_ALLOWED,
-#                    error='Method not Allowed',
-#                    message=message), status.HTTP_405_METHOD_NOT_ALLOWED
-
-# @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-# def mediatype_not_supported(error):
-#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-#     message = str(error)
-#     app.logger.warning(message)
-#     return jsonify(status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-#                    error='Unsupported media type',
-#                    message=message), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-
 ######################################################################
 # Authorization Decorator
 ######################################################################
@@ -142,6 +124,7 @@ def token_required(f):
             return f(*args, **kwargs)
         else:
             return {'message': 'Invalid or missing token'}, 401
+
     return decorated
 
 ######################################################################
@@ -192,6 +175,27 @@ class SupplierResource(Resource):
             api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
         return supplier, status.HTTP_200_OK
 
+    #------------------------------------------------------------------
+    # UPDATE AN EXISTING SUPPLIER
+    #------------------------------------------------------------------
+    @api.doc('update_a_supplier', security='apikey')
+    @api.response(404, 'Supplier not found')
+    @api.response(400, 'The posted supplier data was not valid')
+    @api.expect(supplier_model)
+    @api.marshal_with(supplier_model)
+    @token_required
+    def put(self, supplier_id):
+        """ Update a supplier """
+        app.logger.info('Request to update a supplier with id [%s]', supplier_id)
+        check_content_type('application/json')
+        supplier = Supplier.find(supplier_id)
+        data = request.get_json()
+        if not supplier:
+            return api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' not found".format(supplier_id))
+        supplier.update(**data)
+        # supplier.reload()
+        supplier = Supplier.find(supplier.id)
+        return supplier, status.HTTP_200_OK
     
     #------------------------------------------------------------------
     # DELETE A SUPPLIER
@@ -199,7 +203,7 @@ class SupplierResource(Resource):
 
     @api.doc('delete_suppliers', security='apikey')
     @api.response(204, 'Supplier deleted')
-    # @token_required
+    @token_required
     def delete(self, supplier_id):
         """
         Delete a Supplier
@@ -256,7 +260,7 @@ class SupplierCollection(Resource):
     @api.response(400, 'The posted data was not valid')
     @api.response(201, 'Supplier created successfully')
     @api.marshal_with(supplier_model, code=201)
-    # @token_required
+    @token_required
     def post(self):
         """
         Creates a supplier
@@ -287,11 +291,10 @@ class SupplierCollection(Resource):
 @api.route('/suppliers/<productId>/recommend')
 @api.param('productId', 'The product identifier')
 class ProductResource(Resource):
-    """ Recommend a supplier given a product id"""
     @api.doc('recommend_suppliers')
     @api.response(404, 'Supplier not found')
     def get(self, productId):
-        """ Route to recommend a list of suppliers given a product"""
+        """ Recommend a supplier given a product id"""
         app.logger.info('Recommend suppliers')
         suppliers = Supplier.action_make_recommendation(productId)
         if len(suppliers) <= 0:
@@ -299,29 +302,6 @@ class ProductResource(Resource):
         app.logger.info('[%s] suppliers returned', len(suppliers))
         results = [json.loads(supplier.to_json()) for supplier in suppliers]
         return results, status.HTTP_200_OK
-
-
-######################################################################
-# UPDATE AN EXISTING SUPPLIER
-######################################################################
-@app.route('/suppliers/<string:supplier_id>', methods=['PUT'])
-@api.doc('update_a_supplier')
-@api.response(404, 'Supplier not found')
-@api.response(400, 'The posted supplier data was not valid')
-@api.expect(supplier_model)
-@api.marshal_with(supplier_model)
-def update_a_supplier(supplier_id):
-    """ Update a supplier. """
-    app.logger.info('Request to update a supplier with id [%s]', supplier_id)
-    check_content_type('application/json')
-    supplier = Supplier.find(supplier_id)
-    data = request.get_json()
-    if not supplier:
-        return api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' not found".format(supplier_id))
-    supplier.update(**data)
-    # supplier.reload()
-    supplier = Supplier.find(supplier.id)
-    return supplier, status.HTTP_200_OK
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -340,6 +320,3 @@ def check_content_type(content_type):
             'Invalid Content-Type: %s',
             request.headers['Content-Type'])
         abort(415, 'Content-Type must be {}'.format(content_type))
-
-# if __name__ == '__main__':
-#     app.run()
