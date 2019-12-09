@@ -51,7 +51,7 @@ class TestSuppliers(unittest.TestCase):
         disconnect(testdb_name)
 
     def test_create_a_supplier(self):
-        """ Create a supplier and assert that it exists """
+        """ Test create a supplier and assert that it exists """
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
         self.assertTrue(supplier != None)
         self.assertEqual(supplier.supplierName, "Walmart")
@@ -60,7 +60,7 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.productIdList, ['1','2','3'])
 
     def test_add_a_supplier(self):
-        """ Create a supplier and add it to the database """
+        """ Test create a supplier and add it to the database """
         suppliers = Supplier.all()
         self.assertEqual(len(suppliers), 0)
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
@@ -74,7 +74,7 @@ class TestSuppliers(unittest.TestCase):
         self.assertNotEqual(supplier.id, None)
 
     def test_update_a_supplier(self):
-        """ Update a supplier """
+        """ Test update a supplier """
         supplier = Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3'])
         supplier.save()
         self.assertNotEqual(supplier.id, None)
@@ -91,7 +91,7 @@ class TestSuppliers(unittest.TestCase):
         # pass
 
     def test_list_all_supplier(self):
-        """ Return a list of suppliers """
+        """ Test return a list of suppliers """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.all()
@@ -100,12 +100,12 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(suppliers[1].supplierName, 'Costco')
 
     def test_find_supplier_exception(self):
-        """test exception raised by find. """
+        """ Test exception raised by find. """
         non_exist = Supplier.find("random_id")
         self.assertEqual(non_exist, None)
 
     def test_query_by_name(self):
-        """ Return a supplier given a name """
+        """ Test return a supplier given a name """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         supplier = Supplier.find_by_name("Walmart")
@@ -116,6 +116,7 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(nowhere, None)
     
     def test_query_by_product(self):
+        """ Test query by product """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.find_by_product("4")
@@ -126,6 +127,7 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.productIdList, ['1','3','4'])
 
     def test_query_by_rating(self):
+        """ Test query by rating """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.find_by_rating(5)
@@ -137,7 +139,7 @@ class TestSuppliers(unittest.TestCase):
         self.assertEqual(supplier.productIdList, ['1','2','3'])
 
     def test_query_by_equals_to_rating(self):
-        """ Return a lsit of suppliers with given rating. """
+        """ Test return a lsit of suppliers with given rating. """
         Supplier(supplierName="Walmart", address="NYC", averageRating=5, productIdList = ['1','2','3']).save()
         Supplier(supplierName="Costco", address="SF", averageRating=2, productIdList = ['1','3','4']).save()
         suppliers = Supplier.find_by_equals_to_rating(5)

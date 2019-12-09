@@ -85,7 +85,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
     def test_create_supplier(self):
-        """ Create a new supplier """
+        """ Test create a new supplier """
 
         resp = self.app.post('/suppliers',headers=self.headers)
         self.assertRaises(DataValidationError)
@@ -140,7 +140,7 @@ class TestSupplierServer(unittest.TestCase):
         # self.assertEqual(new_supplier['averageRating'], test_supplier.averageRating, "AverageRating does not match")
 
     def test_update_supplier(self):
-        """ Update an existing supplier """
+        """ Test update an existing supplier """
         # create a supplier to update
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
@@ -172,7 +172,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_supplier_list(self):
-        """ Get a list of suppliers """
+        """ Test get a list of suppliers """
         self._create_suppliers(2)
         resp = self.app.get('/suppliers')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -180,7 +180,7 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(len(data), 2)
 
     def test_delete_supplier(self):
-        """ Delete a Supplier """
+        """ Test delete a Supplier """
         test_supplier = self._create_suppliers(2)[0]
         resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
                                content_type='application/json',
@@ -195,7 +195,7 @@ class TestSupplierServer(unittest.TestCase):
 
 
     def test_get_supplier(self):
-        """ Get a single supplier """
+        """ Test get a single supplier """
 
         supplier = self._create_suppliers(1)
         supplier = supplier[0]
@@ -207,14 +207,14 @@ class TestSupplierServer(unittest.TestCase):
         pass
 
     def test_get_supplier_not_found(self):
-        """ Get a supplier thats not found """
+        """ Test get a supplier thats not found """
         resp = self.app.get('/suppliers/4f4381f4e779897a2c000009')
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         pass
 
     def test_query_supplier_list_by_rating(self):
-        """ Query suppliers by rating """
+        """ Test query suppliers by rating """
         # create a supplier to update
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
@@ -261,7 +261,7 @@ class TestSupplierServer(unittest.TestCase):
 
 
     def test_action_make_recommendation(self):
-        """ Recommend a list of suppliers given a specific product id"""
+        """ Test recommend a list of suppliers given a specific product id"""
         test_supplier = SupplierFactory()
         resp = self.app.post('/suppliers',
                              json=test_supplier.to_json(),
@@ -311,9 +311,14 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_health(self):
-        """ Test Healthcheck """
+        """ Test healthcheck """
         resp = self.app.get('/healthcheck')
         resp_json = json.loads(resp.data.decode('utf-8'))
         
         self.assertEqual(resp_json["message"], 'Healthy')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    
+    def test_api(self):
+        """ Test apidoc """
+        resp = self.app.get('/apidocs/')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
