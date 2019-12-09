@@ -185,7 +185,7 @@ class TestSupplierServer(unittest.TestCase):
         resp = self.app.delete('/suppliers/{}'.format("5dd5b9ced8704e4de9e"),
                                content_type='application/json')
         
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         
 
     def test_get_supplier(self):
