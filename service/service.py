@@ -110,24 +110,6 @@ def not_found(error):
                    error='Not Found',
                    message=message), status.HTTP_404_NOT_FOUND
 
-# @app.errorhandler(status.HTTP_405_METHOD_NOT_ALLOWED)
-# def method_not_supported(error):
-#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-#     message = str(error)
-#     app.logger.warning(message)
-#     return jsonify(status=status.HTTP_405_METHOD_NOT_ALLOWED,
-#                    error='Method not Allowed',
-#                    message=message), status.HTTP_405_METHOD_NOT_ALLOWED
-
-# @app.errorhandler(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-# def mediatype_not_supported(error):
-#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-#     message = str(error)
-#     app.logger.warning(message)
-#     return jsonify(status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-#                    error='Unsupported media type',
-#                    message=message), status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
-
 ######################################################################
 # Authorization Decorator
 ######################################################################
@@ -142,6 +124,7 @@ def token_required(f):
             return f(*args, **kwargs)
         else:
             return {'message': 'Invalid or missing token'}, 401
+
     return decorated
 
 ######################################################################
@@ -320,11 +303,6 @@ class ProductResource(Resource):
         results = [json.loads(supplier.to_json()) for supplier in suppliers]
         return results, status.HTTP_200_OK
 
-
-######################################################################
-# UPDATE AN EXISTING SUPPLIER
-######################################################################
-
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -342,6 +320,3 @@ def check_content_type(content_type):
             'Invalid Content-Type: %s',
             request.headers['Content-Type'])
         abort(415, 'Content-Type must be {}'.format(content_type))
-
-# if __name__ == '__main__':
-#     app.run()
