@@ -39,11 +39,6 @@ from . import app
 #     }
 # }
 
-@app.route('/')
-def index():
-    """ Index Page """
-    return app.send_static_file("index.html")
-
 ######################################################################
 # Configure Swagger before initilaizing it
 ######################################################################
@@ -52,7 +47,8 @@ api = Api(app,
           title='Supplier Demo REST API Service',
           description='This is a sample server Supplier server.',
           default='Suppliers',
-          default_label='Suppliers operations'
+          default_label='Suppliers operations',
+          doc='/'
         # default also could use doc='/apidocs/'
         #   authorizations=authorizations,
         #   prefix='/suppliers'
@@ -151,6 +147,11 @@ def healthcheck():
 def apidoc_page():
     """API Documentation Page"""
     return apidoc.ui_for(api)
+
+# @app.route('/')
+# def index():
+#     """ Index Page """
+#     return app.send_static_file("index.html")
 
 ######################################################################
 #  PATH: /suppliers/{id}
