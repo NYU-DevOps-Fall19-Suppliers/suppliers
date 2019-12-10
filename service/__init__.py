@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 's3cr3t-key-shhhh')
 app = Flask(__name__)
 # app.config['MONGODB_SETTINGS'] = {'host': DATABASE_URI}
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['API_KEY'] = os.getenv('API_KEY')
+# app.config['API_KEY'] = os.getenv('API_KEY')
 app.config['MONGODB_SETTINGS'] = {
     'db': 'myDatabase',
     'host': '127.0.0.1',

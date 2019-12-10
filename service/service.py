@@ -31,13 +31,18 @@ from . import app
 # This database is exposed as the db attribute. (mongo.db)
 
 # Document the type of autorization required
-authorizations = {
-    'apikey': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'X-API-KEY'
-    }
-}
+# authorizations = {
+#     'apikey': {
+#         'type': 'apiKey',
+#         'in': 'header',
+#         'name': 'X-API-KEY'
+#     }
+# }
+
+@app.route('/')
+def index():
+    """ Index Page """
+    return app.send_static_file("index.html")
 
 ######################################################################
 # Configure Swagger before initilaizing it
@@ -48,7 +53,7 @@ api = Api(app,
           description='This is a sample server Supplier server.',
           default='Suppliers',
           default_label='Suppliers operations'
-        #   doc='/', # default also could use doc='/apidocs/'
+        # default also could use doc='/apidocs/'
         #   authorizations=authorizations,
         #   prefix='/suppliers'
          )
@@ -146,12 +151,6 @@ def healthcheck():
 def apidoc_page():
     """API Documentation Page"""
     return apidoc.ui_for(api)
-
-@app.route('/')
-def index():
-    """Home Page"""
-    return app.send_static_file("index.html"), status.HTTP_200_OK
-
 
 ######################################################################
 #  PATH: /suppliers/{id}
