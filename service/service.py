@@ -31,13 +31,13 @@ from . import app
 # This database is exposed as the db attribute. (mongo.db)
 
 # Document the type of autorization required
-authorizations = {
-    'apikey': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'X-API-KEY'
-    }
-}
+# authorizations = {
+#     'apikey': {
+#         'type': 'apiKey',
+#         'in': 'header',
+#         'name': 'X-API-KEY'
+#     }
+# }
 
 ######################################################################
 # Configure Swagger before initilaizing it
@@ -46,10 +46,11 @@ api = Api(app,
           version='1.0.0',
           title='Supplier Demo REST API Service',
           description='This is a sample server Supplier server.',
-          default='suppliers',
+          default='Suppliers',
           default_label='Suppliers operations',
-        #   doc='/', # default also could use doc='/apidocs/'
-          authorizations=authorizations,
+          doc='/'
+        # default also could use doc='/apidocs/'
+        #   authorizations=authorizations,
         #   prefix='/suppliers'
          )
 
@@ -113,26 +114,26 @@ def not_found(error):
 ######################################################################
 # Authorization Decorator
 ######################################################################
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'X-API-KEY' in request.headers:
-            token = request.headers['X-API-KEY']
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         if 'X-API-KEY' in request.headers:
+#             token = request.headers['X-API-KEY']
 
-        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
-            return f(*args, **kwargs)
-        else:
-            return {'message': 'Invalid or missing token'}, 401
+#         if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+#             return f(*args, **kwargs)
+#         else:
+#             return {'message': 'Invalid or missing token'}, 401
 
-    return decorated
+#     return decorated
 
 ######################################################################
 # Function to generate a random API key (good for testing)
 ######################################################################
-def generate_apikey():
-    """ Helper function used when testing API keys """
-    return uuid.uuid4().hex
+# def generate_apikey():
+#     """ Helper function used when testing API keys """
+#     return uuid.uuid4().hex
 
 ######################################################################
 # GET HEALTH CHECK
@@ -147,10 +148,10 @@ def apidoc_page():
     """API Documentation Page"""
     return apidoc.ui_for(api)
 
-@app.route('/')
-def index():
-    return app.send_static_file("index.html"), status.HTTP_200_OK
-
+# @app.route('/')
+# def index():
+#     """ Index Page """
+#     return app.send_static_file("index.html")
 
 ######################################################################
 #  PATH: /suppliers/{id}
@@ -188,12 +189,12 @@ class SupplierResource(Resource):
     #------------------------------------------------------------------
     # UPDATE AN EXISTING SUPPLIER
     #------------------------------------------------------------------
-    @api.doc('update_a_supplier', security='apikey')
+    @api.doc('update_a_supplier')
     @api.response(404, 'Supplier not found')
     @api.response(400, 'The posted supplier data was not valid')
     @api.expect(supplier_model)
     @api.marshal_with(supplier_model)
-    @token_required
+    # @token_required
     def put(self, supplier_id):
         """ Update a supplier """
         app.logger.info('Request to update a supplier with id [%s]', supplier_id)
@@ -211,9 +212,9 @@ class SupplierResource(Resource):
     # DELETE A SUPPLIER
     #------------------------------------------------------------------
 
-    @api.doc('delete_suppliers', security='apikey')
+    @api.doc('delete_suppliers')
     @api.response(204, 'Supplier deleted')
-    @token_required
+    # @token_required
     def delete(self, supplier_id):
         """
         Delete a Supplier
@@ -265,12 +266,12 @@ class SupplierCollection(Resource):
     #------------------------------------------------------------------
     # ADD A NEW SUPPLIER
     #------------------------------------------------------------------
-    @api.doc('create_suppliers', security='apikey')
+    @api.doc('create_suppliers')
     @api.expect(create_model)
     @api.response(400, 'The posted data was not valid')
     @api.response(201, 'Supplier created successfully')
     @api.marshal_with(supplier_model, code=201)
-    @token_required
+    # @token_required
     def post(self):
         """
         Creates a supplier
