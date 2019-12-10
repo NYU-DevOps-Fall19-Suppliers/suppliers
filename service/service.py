@@ -46,7 +46,7 @@ api = Api(app,
           version='1.0.0',
           title='Supplier Demo REST API Service',
           description='This is a sample server Supplier server.',
-          default='suppliers',
+          default='Suppliers',
           default_label='Suppliers operations'
         #   doc='/', # default also could use doc='/apidocs/'
         #   authorizations=authorizations,
@@ -149,6 +149,7 @@ def apidoc_page():
 
 @app.route('/')
 def index():
+    """Home Page"""
     return app.send_static_file("index.html"), status.HTTP_200_OK
 
 
