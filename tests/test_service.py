@@ -182,6 +182,7 @@ class TestSupplierServer(unittest.TestCase):
     def test_delete_supplier(self):
         """ Test delete a Supplier """
         test_supplier = self._create_suppliers(2)[0]
+
         resp = self.app.delete('/suppliers/{}'.format(test_supplier.id),
                                content_type='application/json',
                                headers=self.headers)
@@ -193,6 +194,15 @@ class TestSupplierServer(unittest.TestCase):
                             headers=self.headers)
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_remove_walmart_for_bdd_fix(self):
+        """ Delete the walmart entry for the bdd test"""
+
+        resp = self.app.delete('/suppliers/{}'.format("5dd5b9ced8704e4de9e"),
+                               content_type='application/json',
+                               headers=self.headers)
+        
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        
 
     def test_get_supplier(self):
         """ Test get a single supplier """
