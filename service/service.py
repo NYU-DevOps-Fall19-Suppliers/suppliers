@@ -31,13 +31,18 @@ from . import app
 # This database is exposed as the db attribute. (mongo.db)
 
 # Document the type of autorization required
-authorizations = {
-    'apikey': {
-        'type': 'apiKey',
-        'in': 'header',
-        'name': 'X-API-KEY'
-    }
-}
+# authorizations = {
+#     'apikey': {
+#         'type': 'apiKey',
+#         'in': 'header',
+#         'name': 'X-API-KEY'
+#     }
+# }
+
+@app.route('/')
+def index():
+    """ Index Page """
+    return app.send_static_file("index.html")
 
 ######################################################################
 # Configure Swagger before initilaizing it
@@ -46,18 +51,19 @@ api = Api(app,
           version='1.0.0',
           title='Supplier Demo REST API Service',
           description='This is a sample server Supplier server.',
-          default='suppliers',
+          default='Suppliers',
           default_label='Suppliers operations',
-        #   doc='/', # default also could use doc='/apidocs/'
-          authorizations=authorizations,
+          doc='/'
+        # default also could use doc='/apidocs/'
+        #   authorizations=authorizations,
         #   prefix='/suppliers'
          )
 
 # Define the model so that the docs reflect what can be sent
-# id_fields = {}
-# id_fields['$oid'] = fields.String(readOnly=True)
+id_fields = {}
+id_fields['$oid'] = fields.String(readOnly=True)
 supplier_model = api.model('Supplier', {
-    'id': fields.String(title = 'id',
+    '_id': fields.Nested(id_fields, title = '_id',
                          description='The unique id assigned internally by service'),
     'supplierName': fields.String(required=True,
                           description='The name of the Supplier'),
@@ -68,6 +74,12 @@ supplier_model = api.model('Supplier', {
     'averageRating': fields.Integer(required = False,
                                 description='The average rating of the Supplier')
 })
+# supplier_model = api.schema_model('Supplier', {
+#     '_id' : {'$oid' : {'type' : 'string'}},
+#     'address': {'type' : 'string'},
+#     'productIdList' : {}
+
+# })
 
 create_model = api.model('Supplier', {
     'supplierName': fields.String(required=True,
@@ -81,11 +93,11 @@ create_model = api.model('Supplier', {
 })
 
 # query string arguments
-supplier_args = reqparse.RequestParser()
+# supplier_args = reqparse.RequestParser()
 # supplier_args.add_argument('supplierName', type=str, required=False, help='List Suppliers by name')
 # supplier_args.add_argument('address', type=str, required=False, help='List Suppliers by address')
-supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
-supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
+# supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
+# supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
 
 ######################################################################
 # Error Handlers
@@ -113,26 +125,26 @@ def not_found(error):
 ######################################################################
 # Authorization Decorator
 ######################################################################
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'X-API-KEY' in request.headers:
-            token = request.headers['X-API-KEY']
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         if 'X-API-KEY' in request.headers:
+#             token = request.headers['X-API-KEY']
 
-        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
-            return f(*args, **kwargs)
-        else:
-            return {'message': 'Invalid or missing token'}, 401
+#         if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+#             return f(*args, **kwargs)
+#         else:
+#             return {'message': 'Invalid or missing token'}, 401
 
-    return decorated
+#     return decorated
 
 ######################################################################
 # Function to generate a random API key (good for testing)
 ######################################################################
-def generate_apikey():
-    """ Helper function used when testing API keys """
-    return uuid.uuid4().hex
+# def generate_apikey():
+#     """ Helper function used when testing API keys """
+#     return uuid.uuid4().hex
 
 ######################################################################
 # GET HEALTH CHECK
@@ -146,11 +158,6 @@ def healthcheck():
 def apidoc_page():
     """API Documentation Page"""
     return apidoc.ui_for(api)
-
-@app.route('/')
-def index():
-    return app.send_static_file("index.html"), status.HTTP_200_OK
-
 
 ######################################################################
 #  PATH: /suppliers/{id}
@@ -183,17 +190,17 @@ class SupplierResource(Resource):
         supplier = Supplier.find(supplier_id)
         if not supplier:
             api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
-        return supplier, status.HTTP_200_OK
+        return json.loads(supplier.to_json()), status.HTTP_200_OK
 
     #------------------------------------------------------------------
     # UPDATE AN EXISTING SUPPLIER
     #------------------------------------------------------------------
-    @api.doc('update_a_supplier', security='apikey')
+    @api.doc('update_a_supplier')
     @api.response(404, 'Supplier not found')
     @api.response(400, 'The posted supplier data was not valid')
     @api.expect(supplier_model)
     @api.marshal_with(supplier_model)
-    @token_required
+    # @token_required
     def put(self, supplier_id):
         """ Update a supplier """
         app.logger.info('Request to update a supplier with id [%s]', supplier_id)
@@ -205,15 +212,15 @@ class SupplierResource(Resource):
         supplier.update(**data)
         # supplier.reload()
         supplier = Supplier.find(supplier.id)
-        return supplier, status.HTTP_200_OK
+        return json.loads(supplier.to_json()), status.HTTP_200_OK
     
     #------------------------------------------------------------------
     # DELETE A SUPPLIER
     #------------------------------------------------------------------
 
-    @api.doc('delete_suppliers', security='apikey')
+    @api.doc('delete_suppliers')
     @api.response(204, 'Supplier deleted')
-    @token_required
+    # @token_required
     def delete(self, supplier_id):
         """
         Delete a Supplier
@@ -237,40 +244,42 @@ class SupplierCollection(Resource):
     # LIST ALL SUPPLIERS
     #------------------------------------------------------------------
     @api.doc('list_suppliers')
-    @api.expect(supplier_args, validate=True)
+    # @api.expect(supplier_args, validate=False)
     @api.marshal_list_with(supplier_model)
     @api.response(400, 'Bad Request')
     def get(self):
         """ Returns all of the Suppliers """
         app.logger.info('Request to list Suppliers...')
         suppliers = []
-        args = supplier_args.parse_args()
-        if args['rating']:
-            app.logger.info('Filtering by rating: %d', args['rating'])
-            suppliers = Supplier.find_by_rating(args['rating'])
+        # args = supplier_args.parse_args()
+        rating = request.args.get('rating')
+        averageRating = request.args.get('averageRating')
+        if rating:
+            app.logger.info('Filtering by rating: %s', rating)
+            suppliers = Supplier.find_by_rating(rating)
             if len(suppliers) == 0:
                 return '', status.HTTP_400_BAD_REQUEST
-        elif args['averageRating']:
-            app.logger.info('Filtering by rating: %s', args['averageRating'])
-            suppliers = Supplier.find_by_equals_to_rating(args['averageRating'])
+        elif averageRating:
+            app.logger.info('Filtering by rating: %s', averageRating)
+            suppliers = Supplier.find_by_equals_to_rating(averageRating)
             if len(suppliers) == 0:
                 return '', status.HTTP_400_BAD_REQUEST
         else:
             suppliers = Supplier.all()
 
         app.logger.info('[%s] suppliers returned', len(suppliers))
-        results = [supplier for supplier in suppliers]
+        results = [json.loads(supplier.to_json()) for supplier in suppliers]
         return results, status.HTTP_200_OK
     
     #------------------------------------------------------------------
     # ADD A NEW SUPPLIER
     #------------------------------------------------------------------
-    @api.doc('create_suppliers', security='apikey')
+    @api.doc('create_suppliers')
     @api.expect(create_model)
     @api.response(400, 'The posted data was not valid')
     @api.response(201, 'Supplier created successfully')
     @api.marshal_with(supplier_model, code=201)
-    @token_required
+    # @token_required
     def post(self):
         """
         Creates a supplier
@@ -293,7 +302,7 @@ class SupplierCollection(Resource):
         app.logger.debug('Payload = %s', api.payload)
         app.logger.info('supplier with new id [%s] saved!', supplier.id)
         location_url = api.url_for(SupplierResource, supplier_id=supplier.id, _external=True)
-        return supplier, status.HTTP_201_CREATED, {'Location': location_url}
+        return json.loads(supplier.to_json()), status.HTTP_201_CREATED, {'Location': location_url}
 
 ######################################################################
 #  PATH: /suppliers/{product_id}/recommend
