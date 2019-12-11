@@ -73,8 +73,8 @@ class TestSupplierServer(unittest.TestCase):
             self.assertEqual(resp.status_code, status.HTTP_201_CREATED, 'Could not create test supplier')
 
             new_supplier = json.loads(resp.data.decode('utf-8'))
-            # test_supplier.id = new_supplier["_id"]["$oid"]
-            test_supplier.id = new_supplier["id"]
+            test_supplier.id = new_supplier["_id"]["$oid"]
+            # test_supplier.id = new_supplier["id"]
             suppliers.append(test_supplier)
         return suppliers
 
@@ -150,10 +150,10 @@ class TestSupplierServer(unittest.TestCase):
 
         # update the supplier
         new_supplier = json.loads(resp.data.decode('utf-8'))
-        # new_supplier_id = new_supplier["_id"]["$oid"]
-        new_supplier_id = new_supplier["id"]
-        # new_supplier.pop('_id', None)
-        new_supplier.pop('id', None)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        # new_supplier_id = new_supplier["id"]
+        new_supplier.pop('_id', None)
+        # new_supplier.pop('id', None)
         new_supplier['address'] = 'unknown'
         resp = self.app.put('/suppliers/{}'.format(new_supplier_id),
                             json=new_supplier,
@@ -234,10 +234,10 @@ class TestSupplierServer(unittest.TestCase):
 
         # update the supplier
         new_supplier = json.loads(resp.data.decode('utf-8'))
-        # new_supplier_id = new_supplier["_id"]["$oid"]
-        # new_supplier.pop('_id', None)
-        new_supplier_id = new_supplier["id"]
-        new_supplier.pop('id', None)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        new_supplier.pop('_id', None)
+        # new_supplier_id = new_supplier["id"]
+        # new_supplier.pop('id', None)
         new_supplier['supplierName'] = 'Wholefoods'
         new_supplier['address'] = 'unknown'
         new_supplier['averageRating'] = 6
@@ -279,10 +279,10 @@ class TestSupplierServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         new_supplier = json.loads(resp.data.decode('utf-8'))
-        # new_supplier_id = new_supplier["_id"]["$oid"]
-        # new_supplier.pop('_id', None)
-        new_supplier_id = new_supplier["id"]
-        new_supplier.pop('id', None)
+        new_supplier_id = new_supplier["_id"]["$oid"]
+        new_supplier.pop('_id', None)
+        # new_supplier_id = new_supplier["id"]
+        # new_supplier.pop('id', None)
         new_supplier['productIdList'] = ['2','3','4','5','7']
         new_supplier['averageRating'] = 5
         new_supplier['supplierName'] = 'Wholefoods'

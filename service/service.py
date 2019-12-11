@@ -39,6 +39,11 @@ from . import app
 #     }
 # }
 
+@app.route('/')
+def index():
+    """ Index Page """
+    return app.send_static_file("index.html")
+
 ######################################################################
 # Configure Swagger before initilaizing it
 ######################################################################
@@ -55,10 +60,10 @@ api = Api(app,
          )
 
 # Define the model so that the docs reflect what can be sent
-# id_fields = {}
-# id_fields['$oid'] = fields.String(readOnly=True)
+id_fields = {}
+id_fields['$oid'] = fields.String(readOnly=True)
 supplier_model = api.model('Supplier', {
-    'id': fields.String(title = 'id',
+    '_id': fields.Nested(id_fields, title = '_id',
                          description='The unique id assigned internally by service'),
     'supplierName': fields.String(required=True,
                           description='The name of the Supplier'),
@@ -69,6 +74,12 @@ supplier_model = api.model('Supplier', {
     'averageRating': fields.Integer(required = False,
                                 description='The average rating of the Supplier')
 })
+# supplier_model = api.schema_model('Supplier', {
+#     '_id' : {'$oid' : {'type' : 'string'}},
+#     'address': {'type' : 'string'},
+#     'productIdList' : {}
+
+# })
 
 create_model = api.model('Supplier', {
     'supplierName': fields.String(required=True,
@@ -82,11 +93,11 @@ create_model = api.model('Supplier', {
 })
 
 # query string arguments
-supplier_args = reqparse.RequestParser()
+# supplier_args = reqparse.RequestParser()
 # supplier_args.add_argument('supplierName', type=str, required=False, help='List Suppliers by name')
 # supplier_args.add_argument('address', type=str, required=False, help='List Suppliers by address')
-supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
-supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
+# supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
+# supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
 
 ######################################################################
 # Error Handlers
@@ -148,11 +159,6 @@ def apidoc_page():
     """API Documentation Page"""
     return apidoc.ui_for(api)
 
-# @app.route('/')
-# def index():
-#     """ Index Page """
-#     return app.send_static_file("index.html")
-
 ######################################################################
 #  PATH: /suppliers/{id}
 ######################################################################
@@ -184,7 +190,7 @@ class SupplierResource(Resource):
         supplier = Supplier.find(supplier_id)
         if not supplier:
             api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
-        return supplier, status.HTTP_200_OK
+        return json.loads(supplier.to_json()), status.HTTP_200_OK
 
     #------------------------------------------------------------------
     # UPDATE AN EXISTING SUPPLIER
@@ -206,7 +212,7 @@ class SupplierResource(Resource):
         supplier.update(**data)
         # supplier.reload()
         supplier = Supplier.find(supplier.id)
-        return supplier, status.HTTP_200_OK
+        return json.loads(supplier.to_json()), status.HTTP_200_OK
     
     #------------------------------------------------------------------
     # DELETE A SUPPLIER
@@ -238,29 +244,31 @@ class SupplierCollection(Resource):
     # LIST ALL SUPPLIERS
     #------------------------------------------------------------------
     @api.doc('list_suppliers')
-    @api.expect(supplier_args, validate=True)
+    # @api.expect(supplier_args, validate=False)
     @api.marshal_list_with(supplier_model)
     @api.response(400, 'Bad Request')
     def get(self):
         """ Returns all of the Suppliers """
         app.logger.info('Request to list Suppliers...')
         suppliers = []
-        args = supplier_args.parse_args()
-        if args['rating']:
-            app.logger.info('Filtering by rating: %d', args['rating'])
-            suppliers = Supplier.find_by_rating(args['rating'])
+        # args = supplier_args.parse_args()
+        rating = request.args.get('rating')
+        averageRating = request.args.get('averageRating')
+        if rating:
+            app.logger.info('Filtering by rating: %s', rating)
+            suppliers = Supplier.find_by_rating(rating)
             if len(suppliers) == 0:
                 return '', status.HTTP_400_BAD_REQUEST
-        elif args['averageRating']:
-            app.logger.info('Filtering by rating: %s', args['averageRating'])
-            suppliers = Supplier.find_by_equals_to_rating(args['averageRating'])
+        elif averageRating:
+            app.logger.info('Filtering by rating: %s', averageRating)
+            suppliers = Supplier.find_by_equals_to_rating(averageRating)
             if len(suppliers) == 0:
                 return '', status.HTTP_400_BAD_REQUEST
         else:
             suppliers = Supplier.all()
 
         app.logger.info('[%s] suppliers returned', len(suppliers))
-        results = [supplier for supplier in suppliers]
+        results = [json.loads(supplier.to_json()) for supplier in suppliers]
         return results, status.HTTP_200_OK
     
     #------------------------------------------------------------------
@@ -294,7 +302,7 @@ class SupplierCollection(Resource):
         app.logger.debug('Payload = %s', api.payload)
         app.logger.info('supplier with new id [%s] saved!', supplier.id)
         location_url = api.url_for(SupplierResource, supplier_id=supplier.id, _external=True)
-        return supplier, status.HTTP_201_CREATED, {'Location': location_url}
+        return json.loads(supplier.to_json()), status.HTTP_201_CREATED, {'Location': location_url}
 
 ######################################################################
 #  PATH: /suppliers/{product_id}/recommend

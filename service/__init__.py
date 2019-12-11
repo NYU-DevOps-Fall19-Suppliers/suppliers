@@ -29,7 +29,12 @@ from service import service, models
 
 # Set up logging for production
 # service.initialize_logging()
-
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    if gunicorn_logger:
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+        
 app.logger.info(70 * '*')
 app.logger.info(
     '  S U P P L I E R S   S E R V I C E   R U N N I N G  '.center(

@@ -41,6 +41,10 @@ $(function () {
         var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
 
+        if(!averageRating) {
+            averageRating = 0;
+        }
+
         var data = {
             "supplierName": supplierName,
             "address": address,
@@ -79,6 +83,10 @@ $(function () {
         var address = $("#address").val();
         var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
+
+        if(!averageRating) {
+            averageRating = 0;
+        }
 
         var data = {
             "supplierName": supplierName,
@@ -189,8 +197,8 @@ $(function () {
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/suppliers?" + queryString,
-            contentType: "application/json",
+            url: '/suppliers?' + queryString,
+            contentType: 'application/json',
             data: ''
         })
 
@@ -206,7 +214,7 @@ $(function () {
             header += '<th style="width:20%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
-            res = JSON.parse(res)
+            // res = JSON.parse(res)
             for(var i = 0; i < res.length; i++) {
                 console.log(res[i]);
                 var supplier = res[i];
@@ -260,7 +268,7 @@ $(function () {
             header += '<th style="width:20%">averageRating</th></tr>'
             $("#search_results").append(header);
             var firstSupplier = "";
-            res = JSON.parse(res)
+            // res = JSON.parse(res)
             for(var i = 0; i < res.length; i++) {
                 console.log(res[i]);
                 var supplier = res[i];

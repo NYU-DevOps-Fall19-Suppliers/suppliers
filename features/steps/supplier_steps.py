@@ -62,6 +62,7 @@ def step_impl(context, message):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
+    # flash_message = context.driver.find_element_by_xpath('//*[@id="flash_message"]').text
     expect(context.driver.page_source).to_contain(message)
 
 @then('I should not see "{message}"')
