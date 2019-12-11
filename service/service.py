@@ -93,11 +93,11 @@ create_model = api.model('Supplier', {
 })
 
 # query string arguments
-supplier_args = reqparse.RequestParser()
+# supplier_args = reqparse.RequestParser()
 # supplier_args.add_argument('supplierName', type=str, required=False, help='List Suppliers by name')
 # supplier_args.add_argument('address', type=str, required=False, help='List Suppliers by address')
-supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
-supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
+# supplier_args.add_argument('averageRating', type=int, required=False, help='List Suppliers by rating score')
+# supplier_args.add_argument('rating', type=int, required=False, help='List Suppliers by rating score')
 
 ######################################################################
 # Error Handlers
@@ -244,22 +244,24 @@ class SupplierCollection(Resource):
     # LIST ALL SUPPLIERS
     #------------------------------------------------------------------
     @api.doc('list_suppliers')
-    @api.expect(supplier_args, validate=True)
+    # @api.expect(supplier_args, validate=False)
     @api.marshal_list_with(supplier_model)
     @api.response(400, 'Bad Request')
     def get(self):
         """ Returns all of the Suppliers """
         app.logger.info('Request to list Suppliers...')
         suppliers = []
-        args = supplier_args.parse_args()
-        if args['rating']:
-            app.logger.info('Filtering by rating: %d', args['rating'])
-            suppliers = Supplier.find_by_rating(args['rating'])
+        # args = supplier_args.parse_args()
+        rating = request.args.get('rating')
+        averageRating = request.args.get('averageRating')
+        if rating:
+            app.logger.info('Filtering by rating: %s', rating)
+            suppliers = Supplier.find_by_rating(rating)
             if len(suppliers) == 0:
                 return '', status.HTTP_400_BAD_REQUEST
-        elif args['averageRating']:
-            app.logger.info('Filtering by rating: %s', args['averageRating'])
-            suppliers = Supplier.find_by_equals_to_rating(args['averageRating'])
+        elif averageRating:
+            app.logger.info('Filtering by rating: %s', averageRating)
+            suppliers = Supplier.find_by_equals_to_rating(averageRating)
             if len(suppliers) == 0:
                 return '', status.HTTP_400_BAD_REQUEST
         else:
