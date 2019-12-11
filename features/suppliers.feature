@@ -47,8 +47,8 @@ Scenario: Query suppliers by averageRating
     And I change "averageRating" to "4"
     And I press the "Search" button
     Then I should see "Costco" in the results
-    And I should not see "Walmart" in the results
     And I should not see "Ikea" in the results
+    And I should not see "Apple" in the results
 
 Scenario: Recommend suppliers that provide give products
     When I visit the "Home Page"
@@ -72,10 +72,13 @@ Scenario: Update a Supplier
 
 Scenario: Delete a supplier
     When I visit the "Home Page"
+    And I change "supplierName" to "Walmart"
     And I press the "Search" button
     When I copy from the "supplier_id" field
     And I press the "Clear" button
     And I paste to the "supplier_id" field
     And I press the "Delete" button
-    Then I should see the message "Supplier has been Deleted!"
+    And I paste to the "supplier_id" field
+    And I press the "Retrieve" button
+    Then I should not see "Walmart" in the results
     And I should not see "500 Internal Server Error"
