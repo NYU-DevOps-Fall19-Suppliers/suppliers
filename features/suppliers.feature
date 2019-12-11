@@ -23,7 +23,7 @@ Scenario: List all suppliers
     And I should see "Costco" in the results
     And I should not see "notASupplier" in the results
 
-Scenario: The server is running
+Scenario: Create a Supplier
     When I create a supplier with name "Apple", address "NYC", and product "2,3"
     Then I should get "201 Created"
     And I should not see "500 Internal Server Error"
@@ -48,6 +48,7 @@ Scenario: Query suppliers by averageRating
     And I press the "Search" button
     Then I should see "Costco" in the results
     And I should not see "Ikea" in the results
+    And I should not see "Walmart" in the results
     And I should not see "Apple" in the results
 
 Scenario: Recommend suppliers that provide give products
