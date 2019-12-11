@@ -60,10 +60,10 @@ api = Api(app,
          )
 
 # Define the model so that the docs reflect what can be sent
-# id_fields = {}
-# id_fields['$oid'] = fields.String(readOnly=True)
+id_fields = {}
+id_fields['$oid'] = fields.String(readOnly=True)
 supplier_model = api.model('Supplier', {
-    'id': fields.String(title = 'id',
+    '_id': fields.Nested(id_fields, title = '_id',
                          description='The unique id assigned internally by service'),
     'supplierName': fields.String(required=True,
                           description='The name of the Supplier'),
@@ -74,6 +74,12 @@ supplier_model = api.model('Supplier', {
     'averageRating': fields.Integer(required = False,
                                 description='The average rating of the Supplier')
 })
+# supplier_model = api.schema_model('Supplier', {
+#     '_id' : {'$oid' : {'type' : 'string'}},
+#     'address': {'type' : 'string'},
+#     'productIdList' : {}
+
+# })
 
 create_model = api.model('Supplier', {
     'supplierName': fields.String(required=True,
@@ -184,7 +190,7 @@ class SupplierResource(Resource):
         supplier = Supplier.find(supplier_id)
         if not supplier:
             api.abort(status.HTTP_404_NOT_FOUND, "Supplier with id '{}' was not found.".format(supplier_id))   
-        return supplier, status.HTTP_200_OK
+        return json.loads(supplier.to_json()), status.HTTP_200_OK
 
     #------------------------------------------------------------------
     # UPDATE AN EXISTING SUPPLIER
@@ -206,7 +212,7 @@ class SupplierResource(Resource):
         supplier.update(**data)
         # supplier.reload()
         supplier = Supplier.find(supplier.id)
-        return supplier, status.HTTP_200_OK
+        return json.loads(supplier.to_json()), status.HTTP_200_OK
     
     #------------------------------------------------------------------
     # DELETE A SUPPLIER
@@ -260,7 +266,7 @@ class SupplierCollection(Resource):
             suppliers = Supplier.all()
 
         app.logger.info('[%s] suppliers returned', len(suppliers))
-        results = [supplier for supplier in suppliers]
+        results = [json.loads(supplier.to_json()) for supplier in suppliers]
         return results, status.HTTP_200_OK
     
     #------------------------------------------------------------------
@@ -294,7 +300,7 @@ class SupplierCollection(Resource):
         app.logger.debug('Payload = %s', api.payload)
         app.logger.info('supplier with new id [%s] saved!', supplier.id)
         location_url = api.url_for(SupplierResource, supplier_id=supplier.id, _external=True)
-        return supplier, status.HTTP_201_CREATED, {'Location': location_url}
+        return json.loads(supplier.to_json()), status.HTTP_201_CREATED, {'Location': location_url}
 
 ######################################################################
 #  PATH: /suppliers/{product_id}/recommend
