@@ -1,5 +1,10 @@
 $(function () {
 
+    // Visit Swagger Docs
+    $('#swagger-docs-btn').click(function(){
+        document.location='/apidocs';
+    });
+
     // ****************************************
     //  U T I L I T Y   F U N C T I O N S
     // ****************************************
