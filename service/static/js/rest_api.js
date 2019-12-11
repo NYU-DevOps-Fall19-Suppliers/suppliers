@@ -41,6 +41,10 @@ $(function () {
         var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
 
+        if(!averageRating) {
+            averageRating = 0;
+        }
+
         var data = {
             "supplierName": supplierName,
             "address": address,
@@ -79,6 +83,10 @@ $(function () {
         var address = $("#address").val();
         var productIdList = $("#productIdList").val().replace(" ", "").split(",");
         var averageRating = $("#averageRating").val();
+
+        if(!averageRating) {
+            averageRating = 0;
+        }
 
         var data = {
             "supplierName": supplierName,
