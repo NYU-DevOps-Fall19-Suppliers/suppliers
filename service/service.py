@@ -39,6 +39,11 @@ from . import app
 #     }
 # }
 
+@app.route('/')
+def index():
+    """ Index Page """
+    return app.send_static_file("index.html")
+
 ######################################################################
 # Configure Swagger before initilaizing it
 ######################################################################
@@ -147,11 +152,6 @@ def healthcheck():
 def apidoc_page():
     """API Documentation Page"""
     return apidoc.ui_for(api)
-
-# @app.route('/')
-# def index():
-#     """ Index Page """
-#     return app.send_static_file("index.html")
 
 ######################################################################
 #  PATH: /suppliers/{id}
